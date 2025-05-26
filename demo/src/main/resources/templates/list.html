@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Projects</title></head>
+<body>
+<h1>Projects</h1>
+<a th:href="@{/projects/new}">Create new</a>
+<table>
+    <tr><th>ID</th><th>Name</th><th>Actions</th></tr>
+    <tr th:each="p : ${projects}">
+        <td th:text="${p.id}"></td>
+        <td th:text="${p.name}"></td>
+        <td>
+            <a th:href="@{/projects/{id}/edit(id=${p.id})}">Edit</a>
+            <form th:action="@{/projects/{id}/delete(id=${p.id})}" method="post" style="display:inline">
+                <button type="submit">Delete</button>
+            </form>
+        </td>
+    </tr>
+</table>
+</body>
+</html>
