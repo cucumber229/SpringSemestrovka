@@ -1,0 +1,29 @@
+<!-- templates/fragments/header.html -->
+<nav th:fragment="header"
+     xmlns:th="http://www.thymeleaf.org"
+     xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+     class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+  <div class="container">
+    <a class="navbar-brand" th:href="@{/}">
+      <i class="bi bi-people-fill me-1"></i> TeamManager
+    </a>
+    <div class="navbar-nav">
+      <a class="nav-link" th:href="@{/projects}">Проекты</a>
+      <a class="nav-link" th:href="@{/teams}">Команды</a>
+    </div>
+
+    <!-- неавторизованные -->
+    <div class="navbar-nav ms-auto" sec:authorize="isAnonymous()">
+      <a class="nav-link" th:href="@{/login}">Войти</a>
+      <a class="nav-link" th:href="@{/register}">Регистрация</a>
+    </div>
+
+    <!-- авторизованные -->
+    <div class="navbar-nav ms-auto" sec:authorize="isAuthenticated()">
+      <span class="navbar-text me-3">
+        Привет, <strong sec:authentication="name">имя</strong>
+      </span>
+      <a class="nav-link" th:href="@{/logout}">Выйти</a>
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ru"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+  <title layout:fragment="title"
+         th:text="${title}">Форма проекта</title>
+</head>
+<body>
+<div layout:fragment="content" class="container py-4">
+  <h2 th:text="${title}">Форма проекта</h2>
+  <form th:action="@{/projects}" th:object="${project}" method="post">
+    <input type="hidden" th:if="${project.id}" th:field="*{id}"/>
+    <div class="mb-3">
+      <label class="form-label">Название</label>
+      <input class="form-control" th:field="*{name}"/>
+      <div class="text-danger" th:errors="*{name}"></div>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Описание</label>
+      <textarea class="form-control" th:field="*{description}"></textarea>
+    </div>
+    <button class="btn btn-primary" type="submit">Сохранить</button>
+    <a th:href="@{/projects}" class="btn btn-secondary ms-2">Отмена</a>
+  </form>
+</div>
+</body>
+</html>

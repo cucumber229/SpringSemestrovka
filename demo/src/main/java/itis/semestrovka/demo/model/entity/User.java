@@ -1,21 +1,22 @@
 package itis.semestrovka.demo.model.entity;
 
-
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Collection;
+import java.util.Collections;
 
 @Entity
 @Table(name = "users")
-@Getter @Setter
-public class User {
+@Getter @Setter @NoArgsConstructor
+public class User implements UserDetails {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 50)
+    @Column(unique = true, nullable = false)
     private String username;
 
     @Column(nullable = false)
@@ -23,7 +24,19 @@ public class User {
 
     @Column(nullable = false)
     private boolean enabled = true;
-    @ManyToMany(mappedBy = "members")
-    private Set<Team> teams = new HashSet<>();
-}
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
+
+    @ManyToOne
+    @JoinColumn(name = "team_id")
+    private Team team;
+
+    // --- UserDetails ---
+    @Override public Collection<Role> getAuthorities() { return Collections.singleton(role); }
+    @Override public boolean isAccountNonExpired()  { return true; }
+    @Override public boolean isAccountNonLocked()   { return true; }
+    @Override public boolean isCredentialsNonExpired() { return true; }
+    @Override public boolean isEnabled()            { return true; }
+}
