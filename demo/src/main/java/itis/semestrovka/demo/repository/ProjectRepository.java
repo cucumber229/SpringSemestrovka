@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface ProjectRepository extends JpaRepository<Project,Long> {
     List<Project> findAllByOwnerId(Long ownerId);
+    // добавляем метод, который возвращает все проекты по идентификатору команды
+    List<Project> findAllByTeamId(Long teamId);
 }

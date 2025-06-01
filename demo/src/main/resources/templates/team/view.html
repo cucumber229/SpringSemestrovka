@@ -1,0 +1,73 @@
+<!-- src/main/resources/templates/team/view.html -->
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+  <title layout:fragment="title">Просмотр команды</title>
+</head>
+<body>
+<div layout:fragment="content" class="mt-5">
+  <h2 th:text="${title}">Просмотр команды</h2>
+  <div class="mb-3">
+    <a th:href="@{/teams}" class="btn btn-outline-secondary">Назад к списку команд</a>
+    <!-- если админ, добавить кнопки редактирования/удаления -->
+    <a th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}"
+       th:href="@{|/teams/${team.id}/edit|}"
+       class="btn btn-sm btn-outline-primary ms-2">
+      Редактировать
+    </a>
+    <form th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}"
+          th:action="@{|/teams/${team.id}/delete|}"
+          method="post"
+          style="display:inline">
+      <button type="submit" class="btn btn-sm btn-outline-danger ms-2">
+        Удалить
+      </button>
+    </form>
+  </div>
+  <dl class="row">
+    <dt class="col-sm-2">ID</dt>
+    <dd class="col-sm-10" th:text="${team.id}">1</dd>
+    <dt class="col-sm-2">Название</dt>
+    <dd class="col-sm-10" th:text="${team.name}">Название команды</dd>
+    <dt class="col-sm-2">Описание</dt>
+    <dd class="col-sm-10" th:text="${team.description}">Описание команды</dd>
+    <dt class="col-sm-2">Создана</dt>
+    <dd class="col-sm-10" th:text="${#temporals.format(team.createdAt, 'dd.MM.yyyy HH:mm')}">01.01.2025 12:00</dd>
+  </dl>
+
+  <h4 class="mt-4">Участники</h4>
+  <table class="table table-sm">
+    <thead>
+    <tr>
+      <th>Имя пользователя</th>
+      <th>Действие</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="u : ${team.members}">
+      <td th:text="${u.username}">username</td>
+      <td>
+        <!-- только админ может удалять из команды -->
+        <form th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}"
+              th:action="@{|/teams/${team.id}/remove-user|}"
+              method="post">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+          <input type="hidden" name="userId" th:value="${u.id}" />
+          <button type="submit" class="btn btn-sm btn-outline-danger">Убрать</button>
+        </form>
+      </td>
+    </tr>
+    <tr th:if="${#lists.isEmpty(team.members)}">
+      <td colspan="2" class="text-center py-2">Нет участников</td>
+    </tr>
+    </tbody>
+  </table>
+
+  <!-- кнопка «Добавить пользователя» для администратора -->
+  <div th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+    <a th:href="@{|/teams/${team.id}/add-user|}"
+       class="btn btn-sm btn-success">Добавить пользователя</a>
+  </div>
+</div>
+</body>
+</html>

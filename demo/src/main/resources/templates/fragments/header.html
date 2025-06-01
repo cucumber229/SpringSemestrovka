@@ -23,7 +23,11 @@
       <span class="navbar-text me-3">
         Привет, <strong sec:authentication="name">имя</strong>
       </span>
-      <a class="nav-link" th:href="@{/logout}">Выйти</a>
+      <form th:action="@{/logout}" method="post" class="d-inline">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+        <button type="submit" class="btn btn-link nav-link">Выйти</button>
+      </form>
+
     </div>
   </div>
 </nav>

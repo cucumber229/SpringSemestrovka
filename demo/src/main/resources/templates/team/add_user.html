@@ -1,0 +1,30 @@
+<!-- src/main/resources/templates/team/add_user.html -->
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+  <title layout:fragment="title">Добавить пользователя в команду</title>
+</head>
+<body>
+<div layout:fragment="content" class="mt-5">
+  <h2 th:text="${title}">Добавить пользователя в команду</h2>
+  <div class="mb-3">
+    <a th:href="@{|/teams/${team.id}/view|}" class="btn btn-outline-secondary">Назад к команде</a>
+  </div>
+  <form th:action="@{|/teams/${team.id}/add-user|}" method="post" class="mt-3">
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+    <div class="mb-3">
+      <label class="form-label">Выбрать пользователя</label>
+      <select name="userId" class="form-select">
+        <option value="" disabled selected>— Выберите пользователя —</option>
+        <option th:each="u : ${allUsers}"
+                th:value="${u.id}"
+                th:text="${u.username}">User</option>
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-success">Добавить</button>
+  </form>
+</div>
+</body>
+</html>

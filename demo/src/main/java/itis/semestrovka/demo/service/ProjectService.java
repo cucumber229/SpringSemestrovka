@@ -9,4 +9,5 @@ public interface ProjectService {
     Project findById(Long id);
     Project save(Project project);
     void deleteById(Long id);
+    List<Project> findAllByTeamId(Long teamId);
 }

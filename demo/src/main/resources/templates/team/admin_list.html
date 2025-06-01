@@ -1,0 +1,44 @@
+<!-- src/main/resources/templates/team/admin_list.html -->
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+  <title layout:fragment="title">Управление командами</title>
+</head>
+<body>
+<div layout:fragment="content" class="mt-5">
+  <h2 th:text="${title}">Управление командами</h2>
+  <div class="mb-3">
+    <a th:href="@{/teams/new}" class="btn btn-success">Создать новую команду</a>
+    <a th:href="@{/teams}" class="btn btn-outline-secondary ms-2">Назад к списку</a>
+  </div>
+  <table class="table table-hover">
+    <thead class="table-light">
+    <tr>
+      <th>ID</th>
+      <th>Название</th>
+      <th>Участников</th>
+      <th>Действия</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="t : ${teams}">
+      <td th:text="${t.id}">1</td>
+      <td th:text="${t.name}">Название</td>
+      <td th:text="${t.members.size()}">0</td>
+      <td>
+        <a th:href="@{|/teams/{t.id}/edit|(t.id=${t.id})}" class="btn btn-sm btn-outline-primary me-2">
+          Редактировать
+        </a>
+        <form th:action="@{|/teams/{t.id}/delete|(t.id=${t.id})}" method="post" style="display:inline">
+          <button type="submit" class="btn btn-sm btn-outline-danger">Удалить</button>
+        </form>
+      </td>
+    </tr>
+    <tr th:if="${#lists.isEmpty(teams)}">
+      <td colspan="4" class="text-center py-3">Нет команд</td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+</body>
+</html>

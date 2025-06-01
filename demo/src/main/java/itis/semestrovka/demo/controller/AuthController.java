@@ -51,12 +51,13 @@ public class AuthController {
     @GetMapping("/login")
     public String loginForm(
             Model model,
-            @RequestParam(required = false) boolean registered,
-            @RequestParam(required = false) boolean error
+            @RequestParam(required = false) String registered,
+            @RequestParam(required = false) String error
     ) {
         model.addAttribute("title", "Вход");
-        model.addAttribute("registered", registered);
-        model.addAttribute("loginError", error);
+        // если параметр присутствует (даже без значения), строка не null
+        model.addAttribute("registered", registered != null);
+        model.addAttribute("loginError", error != null);
         return "auth/login";
     }
 }

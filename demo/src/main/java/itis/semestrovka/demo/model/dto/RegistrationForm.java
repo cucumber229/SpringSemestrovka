@@ -7,8 +7,11 @@ import lombok.Data;
 
 @Data
 public class RegistrationForm {
-    @NotBlank @Size(min=4, max=20)
+    @NotBlank
+    @Size(min = 4, max = 20)
     private String username;
-    @NotBlank @Size(min=6)
+
+    @NotBlank
+    @Size(min = 6)
     private String password;
 }

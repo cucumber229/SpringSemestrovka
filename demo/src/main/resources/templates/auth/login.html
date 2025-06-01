@@ -18,10 +18,10 @@
     Регистрация прошла успешно! Пожалуйста, войдите.
   </div>
 
-  <!-- сообщение об ошибке логина -->
   <div th:if="${loginError}" class="alert alert-danger">
     Неверное имя пользователя или пароль
   </div>
+
 
   <form th:action="@{/login}" method="post" class="mt-3">
     <!-- CSRF токен -->

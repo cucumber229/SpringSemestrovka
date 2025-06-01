@@ -1,0 +1,45 @@
+<!-- src/main/resources/templates/team/list.html -->
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+    <title layout:fragment="title">Список команд</title>
+</head>
+<body>
+<div layout:fragment="content" class="mt-5">
+    <h2 th:text="${title}">Список команд</h2>
+    <div class="mb-3">
+        <!-- если админ, показать кнопку «Управление командами» -->
+        <a th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}"
+           th:href="@{/teams/admin}"
+           class="btn btn-secondary mb-3">
+            Перейти в админку команд
+        </a>
+    </div>
+    <table class="table table-hover">
+        <thead class="table-light">
+        <tr>
+            <th>ID</th>
+            <th>Название</th>
+            <th>Участников</th>
+            <th>Действия</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="t : ${teams}">
+            <td th:text="${t.id}">1</td>
+            <td th:text="${t.name}">Название</td>
+            <td th:text="${t.members.size()}">0</td>
+            <td>
+                <a th:href="@{|/teams/${t.id}/view|}" class="btn btn-sm btn-outline-primary">
+                    Просмотреть
+                </a>
+            </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(teams)}">
+            <td colspan="4" class="text-center py-3">Нет команд</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

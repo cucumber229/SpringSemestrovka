@@ -13,7 +13,8 @@ import java.util.Collections;
 @Table(name = "users")
 @Getter @Setter @NoArgsConstructor
 public class User implements UserDetails {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(unique = true, nullable = false)
@@ -29,14 +30,15 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private Role role;
 
+    // Здесь связь «многие‐к‐одному»: у каждого пользователя – ровно одна команда (или null)
     @ManyToOne
     @JoinColumn(name = "team_id")
     private Team team;
 
-    // --- UserDetails ---
+    // --- UserDetails implementation ---
     @Override public Collection<Role> getAuthorities() { return Collections.singleton(role); }
     @Override public boolean isAccountNonExpired()  { return true; }
     @Override public boolean isAccountNonLocked()   { return true; }
     @Override public boolean isCredentialsNonExpired() { return true; }
-    @Override public boolean isEnabled()            { return true; }
+    @Override public boolean isEnabled()            { return enabled; }
 }
