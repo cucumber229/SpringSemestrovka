@@ -1,9 +1,7 @@
 package itis.semestrovka.demo.controller;
 
-import itis.semestrovka.demo.model.entity.Role;
-import itis.semestrovka.demo.model.entity.User;
-import itis.semestrovka.demo.repository.UserRepository;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import itis.semestrovka.demo.model.dto.RegistrationForm;
+import itis.semestrovka.demo.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -14,56 +12,51 @@ import jakarta.validation.Valid;
 @Controller
 public class AuthController {
 
-    private final UserRepository userRepo;
-    private final PasswordEncoder encoder;
+    private final UserService userService;
 
-    public AuthController(UserRepository userRepo, PasswordEncoder encoder) {
-        this.userRepo = userRepo;
-        this.encoder = encoder;
+    public AuthController(UserService userService) {
+        this.userService = userService;
     }
 
     @GetMapping("/register")
     public String registerForm(Model model) {
-        model.addAttribute("user", new User());
+        model.addAttribute("form", new RegistrationForm());
         model.addAttribute("title", "Регистрация");
         return "auth/register";
     }
 
     @PostMapping("/register")
     public String register(
-            @Valid @ModelAttribute("user") User user,
+            @Valid @ModelAttribute("form") RegistrationForm form,
             BindingResult br,
             Model model
     ) {
-        // 1) если есть ошибки валидации — сразу возвращаем форму
+        model.addAttribute("title", "Регистрация");
+        // 1) валидация DTO
         if (br.hasErrors()) {
-            model.addAttribute("title", "Регистрация");
             return "auth/register";
         }
-
-        // 2) проверяем заранее, есть ли уже такой username
-        if (userRepo.existsByUsername(user.getUsername())) {
-            br.rejectValue("username", "duplicate", "Пользователь с таким именем уже существует");
-            model.addAttribute("title", "Регистрация");
+        try {
+            // 2) делегируем регистрацию в сервис
+            userService.register(form);
+        } catch (IllegalArgumentException ex) {
+            // 3) ловим дубликат и возвращаем форму
+            br.rejectValue("username", "duplicate", ex.getMessage());
             return "auth/register";
         }
-
-        // 3) кодируем пароль, ставим роль и сохраняем
-        user.setPassword(encoder.encode(user.getPassword()));
-        user.setRole(Role.ROLE_USER);
-        userRepo.save(user);
-
-        // 4) редирект на логин с флагом registered=true
+        // 4) успех — редиректим на логин с флагом
         return "redirect:/login?registered";
     }
 
     @GetMapping("/login")
     public String loginForm(
             Model model,
-            @RequestParam(required = false) String registered
+            @RequestParam(required = false) boolean registered,
+            @RequestParam(required = false) boolean error
     ) {
         model.addAttribute("title", "Вход");
-        model.addAttribute("registered", registered != null);
+        model.addAttribute("registered", registered);
+        model.addAttribute("loginError", error);
         return "auth/login";
     }
 }

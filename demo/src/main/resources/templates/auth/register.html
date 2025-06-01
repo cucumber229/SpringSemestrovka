@@ -9,14 +9,11 @@
 <body>
 <div layout:fragment="content" class="mt-5">
   <h2>Регистрация</h2>
-
   <form th:action="@{/register}"
-        th:object="${user}"
+        th:object="${form}"
         method="post"
         class="mt-4">
-    <input type="hidden"
-           th:name="${_csrf.parameterName}"
-           th:value="${_csrf.token}"/>
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 
     <div class="mb-3">
       <label class="form-label">Имя пользователя</label>
@@ -38,8 +35,7 @@
   </form>
 
   <p class="mt-3">
-    Уже есть аккаунт?
-    <a th:href="@{/login}">Войти</a>
+    Уже есть аккаунт? <a th:href="@{/login}">Войти</a>
   </p>
 </div>
 </body>
