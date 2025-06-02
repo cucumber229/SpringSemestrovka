@@ -15,10 +15,6 @@ body {
     box-shadow: 0 6px 40px 0 rgba(0, 0, 0, 0.10);
     transition: transform .12s;
 }
-.card:hover {
-    transform: translateY(-4px) scale(1.02);
-    box-shadow: 0 12px 48px 0 rgba(49,46,129, 0.12);
-}
 .btn-main {
     background: #6366f1;
     color: white;
@@ -38,4 +34,41 @@ body {
 }
 main {
     margin-top: 2rem;
+}
+/* Стили для интерактивного hover-текста и underline только в header */
+header .nav-link {
+    position: relative;
+    color: #ffffff;                /* исходный цвет текста в шапке */
+    transition: color 0.3s ease;   /* плавное изменение цвета при наведении */
+}
+
+/* «Подчёркивающая» полоса под ссылкой (изначально скрыта) */
+header .nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -2px;                  /* чуть ниже текста */
+    width: 0;
+    height: 2px;
+    background-color: #ffffff;     /* цвет линии (можно поменять) */
+    transition: width 0.3s ease;   /* анимация расширения при hover */
+}
+
+/* При наведении на ссылку */
+header .nav-link:hover {
+    color: #ffd700;                /* цвет текста при hover (золотистый) */
+}
+
+header .nav-link:hover::after {
+    width: 100%;                   /* растягиваем полосу на всю ширину ссылки */
+}
+
+/* Для активной ссылки (класс active, устанавливаемый Thymeleaf) */
+header .nav-link.active {
+    color: #ffd700;                /* цвет текста активной ссылки */
+}
+
+header .nav-link.active::after {
+    width: 100%;
+    background-color: #ffd700;     /* цвет линии у активной ссылки */
 }
