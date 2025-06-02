@@ -135,14 +135,10 @@ public class ProjectController {
 
     /**
      * 6) Страница просмотра деталей проекта.
-     *    Доступны:
-     *      - Владелец проекта,
-     *      - Любой участник той же команды (если у проекта team != null),
-     *      - ADMIN.
      */
     @GetMapping("/{id}/view")
     @PreAuthorize(
-            "@projectService.findById(#id).owner.username == authentication.name " +
+            "@rojectService.findById(#id).owner.username == authentication.name " +
                     "or ( @projectService.findById(#id).team != null && " +
                     "     @projectService.findById(#id).team.id == principal.team.id ) " +
                     "or hasRole('ROLE_ADMIN')"
