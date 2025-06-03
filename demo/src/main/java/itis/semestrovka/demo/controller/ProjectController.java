@@ -1,9 +1,11 @@
+// src/main/java/itis/semestrovka/demo/controller/ProjectController.java
 package itis.semestrovka.demo.controller;
 
 import itis.semestrovka.demo.model.entity.Project;
 import itis.semestrovka.demo.model.entity.User;
 import itis.semestrovka.demo.service.ProjectService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -24,40 +26,102 @@ public class ProjectController {
     }
 
     /**
-     * 1) Список проектов:
-     *    – если у пользователя есть команда — показать все проекты его команды,
-     *    – иначе — только проекты, которыми он владеет.
+     * 1) Список проектов. GET-параметры:
+     *    - type (возможные значения: all / team / personal; default = "all")
+     *    - sortField (имя поля, по которому сортируем; default = "name")
+     *    - sortDir   (asc или desc; default = "asc")
+     *
+     *    Если у пользователя нет команды, принудительно type = "personal"
      */
     @GetMapping
-    public String list(Model model,
-                       @AuthenticationPrincipal User currentUser) {
-
+    public String list(
+            @RequestParam(value = "type", required = false, defaultValue = "all") String type,
+            @RequestParam(value = "sortField", required = false, defaultValue = "name") String sortField,
+            @RequestParam(value = "sortDir", required = false, defaultValue = "asc") String sortDir,
+            Model model,
+            @AuthenticationPrincipal User currentUser
+    ) {
         boolean hasTeam = (currentUser.getTeam() != null);
-        model.addAttribute("hasTeam", hasTeam);
+        // Если у пользователя нет команды, показываем только личные проекты
+        if (!hasTeam) {
+            type = "personal";
+        }
+
+        // Сортировка: если field = "type", мы будем сортировать принудительно по приоритету team IS NULL / not null,
+        // иначе по любому существующему поле Project.
+        // Для простоты здесь поддерживаем только: name, owner.username, priority, и «type» (type=team/personal).
+        Sort sort;
+        Sort.Direction direction = sortDir.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        if ("type".equals(sortField)) {
+            // «type» сортируем так: сначала все «Командные» (team != null), затем «Личные» (team is null)
+            // Чтобы завести такую логику через Sort, добавим virtual property "team.id" (некоторые СУБД разрешают)
+            // либо прямо сортируем по условию: (p.team is null) ASC — тогда командные (не null) будут выше.
+            // В JPA/Spring Data «team.id» null => приходит первым, поэтому если direction=ASC, «Личные» будут наверху.
+            // Чтоб поменять местами, просто инвертируем direction:
+            if (direction == Sort.Direction.ASC) {
+                // ASC по team.id (пустые → NULL → «Личные» наверху, а хотелось бы «Командные»)
+                sort = Sort.by(Sort.Order.asc("team.id")).and(Sort.by(direction, "name"));
+            } else {
+                // DESC по team.id (не NULL → сразу «Командные» идут первыми)
+                sort = Sort.by(Sort.Order.desc("team.id")).and(Sort.by(direction, "name"));
+            }
+        } else {
+            // Остальные поля: «name», «priority» или «owner.username»
+            // Для сортировки по владельцу: укажем «owner.username»
+            sort = Sort.by(direction, sortField);
+        }
 
         List<Project> projects;
+        String title;
+
         if (!hasTeam) {
-            // Личные проекты (у пользователя нет команды):
-            // — показываем только проекты, где он — владелец
-            projects = projectService.findAllByOwnerId(currentUser.getId());
-            model.addAttribute("title", "Мои проекты");
+            // Личные проекты
+            projects = projectService.findAllByOwnerId(currentUser.getId(), sort);
+            title = "Мои личные проекты";
         } else {
-            // У пользователя есть команда — показываем все проекты его команды
-            Long teamId = currentUser.getTeam().getId();
-            projects = projectService.findAllByTeamId(teamId);
-            model.addAttribute("title", "Проекты команды «" + currentUser.getTeam().getName() + "»");
+            Long teamId  = currentUser.getTeam().getId();
+            Long ownerId = currentUser.getId();
+
+            switch (type) {
+                case "team":
+                    projects = projectService.findAllByTeamId(teamId, sort);
+                    title = "Только командные проекты «" + currentUser.getTeam().getName() + "»";
+                    break;
+                case "personal":
+                    // Только личные (team IS NULL)
+                    projects = projectService.findAllByOwnerId(currentUser.getId(), sort)
+                            .stream()
+                            .filter(p -> p.getTeam() == null)
+                            .toList();
+                    title = "Только мои личные проекты";
+                    break;
+                case "all":
+                default:
+                    projects = projectService.findTeamAndPersonalProjects(teamId, ownerId, sort);
+                    title = "Все проекты (команда + личные)";
+                    break;
+            }
         }
+
         model.addAttribute("projects", projects);
+        model.addAttribute("hasTeam", hasTeam);
+        model.addAttribute("type", type);
+        model.addAttribute("sortField", sortField);
+        model.addAttribute("sortDir", sortDir);
+        model.addAttribute("title", title);
+
+        // Для удобства переключения направления сортировки (при клике на заголовок)
+        String reverseDir = sortDir.equalsIgnoreCase("asc") ? "desc" : "asc";
+        model.addAttribute("reverseDir", reverseDir);
+
         return "project/list";
     }
 
     /**
-     * 2) Форма создания нового проекта.
-     *    Передаём флаг hasTeam, чтобы в шаблоне можно было отобразить выбор «Личный»/«Командный» проект.
+     * 2) Форма создания проекта.
      */
     @GetMapping("/new")
-    public String createForm(Model model,
-                             @AuthenticationPrincipal User currentUser) {
+    public String createForm(Model model, @AuthenticationPrincipal User currentUser) {
         model.addAttribute("project", new Project());
         model.addAttribute("hasTeam", currentUser.getTeam() != null);
         model.addAttribute("title", "Новый проект");
@@ -65,9 +129,7 @@ public class ProjectController {
     }
 
     /**
-     * 3) Обработка сохранения (нового или редактируемого проекта).
-     *    В запросе обязательно приходит параметр "projectType" (значения: "PRIVATE" или "TEAM"),
-     *    который отвечает за то, где хранить проект (связь с командой или нет).
+     * 3) Сохранение (нового или редактируемого) проекта.
      */
     @PostMapping
     public String save(
@@ -77,7 +139,6 @@ public class ProjectController {
             @AuthenticationPrincipal User currentUser,
             Model model
     ) {
-        // 3.1) Если есть ошибки валидации (например, пустое название) — возвращаем форму
         if (br.hasErrors()) {
             model.addAttribute("hasTeam", currentUser.getTeam() != null);
             model.addAttribute("title",
@@ -85,43 +146,38 @@ public class ProjectController {
             return "project/form";
         }
 
-        // 3.2) Устанавливаем владельца (owner = текущий пользователь)
+        // Назначаем владельца
         project.setOwner(currentUser);
 
-        // 3.3) В зависимости от projectType («TEAM» или «PRIVATE»)
+        // В зависимости от projectType: TEAM или PRIVATE
         if ("TEAM".equals(projectType) && currentUser.getTeam() != null) {
             project.setTeam(currentUser.getTeam());
         } else {
             project.setTeam(null);
         }
 
-        // 3.4) Сохраняем проект
         projectService.save(project);
         return "redirect:/projects";
     }
 
     /**
-     * 4) Форма редактирования проекта:
-     *    доступно владельцу проекта или ADMIN.
+     * 4) Форма редактирования.
      */
     @GetMapping("/{id}/edit")
     @PreAuthorize(
             "@projectService.findById(#id).owner.username == authentication.name " +
                     "or hasRole('ROLE_ADMIN')"
     )
-    public String editForm(@PathVariable Long id,
-                           Model model,
-                           @AuthenticationPrincipal User currentUser) {
+    public String editForm(@PathVariable Long id, Model model, @AuthenticationPrincipal User currentUser) {
         Project p = projectService.findById(id);
         model.addAttribute("project", p);
         model.addAttribute("hasTeam", currentUser.getTeam() != null);
-        model.addAttribute("title", "Редактирование проекта");
+        model.addAttribute("title", "Редактировать проект");
         return "project/form";
     }
 
     /**
-     * 5) Удаление проекта:
-     *    доступно владельцу проекта или ADMIN.
+     * 5) Удаление проекта.
      */
     @PostMapping("/{id}/delete")
     @PreAuthorize(
@@ -134,18 +190,16 @@ public class ProjectController {
     }
 
     /**
-     * 6) Страница просмотра деталей проекта.
+     * 6) Просмотреть детали проекта.
      */
     @GetMapping("/{id}/view")
     @PreAuthorize(
-            "@rojectService.findById(#id).owner.username == authentication.name " +
+            "@projectService.findById(#id).owner.username == authentication.name " +
                     "or ( @projectService.findById(#id).team != null && " +
-                    "     @projectService.findById(#id).team.id == principal.team.id ) " +
+                    "     @projectService.findById(#id).team.id == authentication.principal.team.id ) " +
                     "or hasRole('ROLE_ADMIN')"
     )
-    public String view(@PathVariable Long id,
-                       Model model) {
-
+    public String view(@PathVariable Long id, Model model) {
         Project project = projectService.findById(id);
         model.addAttribute("project", project);
         model.addAttribute("title", "Детали проекта «" + project.getName() + "»");

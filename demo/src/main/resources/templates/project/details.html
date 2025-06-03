@@ -15,52 +15,56 @@
   <div class="container mt-4">
     <div class="card shadow-sm">
       <div class="card-header bg-primary text-white">
-        <h3 class="mb-0"
-            th:text="'Детали проекта «' + ${project.name} + '»'">
+        <h3 class="mb-0" th:text="'Детали проекта «' + ${project.name} + '»'">
           Детали проекта
         </h3>
       </div>
       <div class="card-body">
         <p><strong>ID:</strong> <span th:text="${project.id}">3</span></p>
         <p><strong>Название:</strong> <span th:text="${project.name}">проверка</span></p>
-        <p><strong>Описание:</strong> <span th:text="${project.description}">Описание проекта</span></p>
-        <p><strong>Владелец:</strong> <span th:text="${project.owner.username}">ownerUsername</span></p>
+        <p><strong>Описание:</strong> <span th:text="${project.description}">Описание</span></p>
+        <p><strong>Владелец:</strong> <span th:text="${project.owner.username}">111111</span></p>
+
+        <!-- Новый блок: Приоритет -->
+        <p>
+          <strong>Приоритет:</strong>
+          <span th:switch="${project.priority}">
+                    <span th:case="1">Низкий</span>
+                    <span th:case="2">Средний</span>
+                    <span th:case="3">Высокий</span>
+                    <span th:case="*">—</span>
+                  </span>
+        </p>
+
         <p>
           <strong>Команда:</strong>
-          <span th:text="${project.team != null ? project.team.name : '—'}">—</span>
+          <span th:text="${project.team != null ? project.team.name : '—'}">Анастасия</span>
         </p>
         <p>
           <strong>Дата создания:</strong>
           <span th:text="${#temporals.format(project.createdAt, 'dd.MM.yyyy HH:mm')}">
-                            02.06.2025 01:21
-                        </span>
+                        02.06.2025 01:21
+                    </span>
         </p>
       </div>
-
       <div class="card-footer d-flex justify-content-between">
         <a th:href="@{/projects}" class="btn btn-outline-secondary">
           ← Назад к списку проектов
         </a>
+
+        <!-- Кнопки «Редактировать»/«Удалить» видны только владельцу или ADMIN -->
         <div>
-          <!--
-            Показываем «Редактировать» и «Удалить» только если:
-            1) #authentication не null (то есть пользователь аутентифицирован)
-            2) И его имя совпадает с project.owner.username
-               либо #authorization.expression('hasRole(''ROLE_ADMIN'')') возвращает true
-            Всё записано в одну строку без переносов!
-          -->
-          <a th:if="${#authentication != null and (#authentication.name == project.owner.username or #authorization.expression('hasRole(''ROLE_ADMIN'')'))}"
+          <a th:if="${project.owner.username == #authentication.name
+                               or #authentication.principal.role == 'ROLE_ADMIN'}"
              th:href="@{|/projects/${project.id}/edit|}"
              class="btn btn-primary me-2">
             Редактировать
           </a>
-          <form th:if="${#authentication != null and (#authentication.name == project.owner.username or #authorization.expression('hasRole(''ROLE_ADMIN'')'))}"
+          <form th:if="${project.owner.username == #authentication.name
+                                  or #authentication.principal.role == 'ROLE_ADMIN'}"
                 th:action="@{|/projects/${project.id}/delete|}"
-                method="post"
-                style="display:inline;">
-            <input type="hidden"
-                   th:name="${_csrf.parameterName}"
-                   th:value="${_csrf.token}" />
+                method="post" style="display:inline;">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
             <button type="submit"
                     class="btn btn-danger"
                     onclick="return confirm('Вы действительно хотите удалить проект?');">
