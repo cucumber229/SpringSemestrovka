@@ -68,30 +68,71 @@
         </div>
         <div class="card-body p-0">
           <div class="table-responsive">
-            <table class="table table-hover mb-0">
+            <table id="membersTable" class="table table-hover mb-0">
               <thead class="table-light">
               <tr>
                 <th>Имя пользователя</th>
+                <th sec:authorize="hasRole('ROLE_ADMIN')" class="text-end">Действия</th>
               </tr>
               </thead>
               <tbody>
               <tr th:each="user : ${team.members}">
                 <td th:text="${user.username}">user</td>
+                <td sec:authorize="hasRole('ROLE_ADMIN')" class="text-end">
+                  <button type="button"
+                          class="btn btn-sm btn-outline-danger btn-remove-user"
+                          th:data-user-id="${user.id}">
+                    Удалить
+                  </button>
+                </td>
               </tr>
               <tr th:if="${#lists.isEmpty(team.members)}">
-                <td class="text-center py-3">Участников нет</td>
+                <td class="text-center py-3" colspan="2">Участников нет</td>
               </tr>
               </tbody>
             </table>
           </div>
         </div>
         <div class="card-footer text-muted">
-          Всего участников: <span th:text="${team.members.size()}">0</span>
+          Всего участников: <span id="memberCount" th:text="${team.members.size()}">0</span>
         </div>
       </div>
     </div>
   </div>
 
+  <script th:inline="javascript">
+    /*<![CDATA[*/
+    const teamId = /*[[${team.id}]]*/ 0;
+    const csrfHeader = /*[['${_csrf.headerName}']]*/ 'X-CSRF-TOKEN';
+    const csrfToken  = /*[['${_csrf.token}']]*/ '';
+
+    document.querySelectorAll('.btn-remove-user').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        if (!confirm('Удалить пользователя из команды?')) return;
+        const userId = btn.dataset.userId;
+        const resp = await fetch(`/api/teams/${teamId}/users/${userId}`, {
+          method: 'DELETE',
+          headers: { [csrfHeader]: csrfToken }
+        });
+        if (resp.ok) {
+          const row = btn.closest('tr');
+          row.remove();
+          const tbody = document.querySelector('#membersTable tbody');
+          const countElem = document.getElementById('memberCount');
+          const rows = tbody.querySelectorAll('tr');
+          countElem.textContent = rows.length;
+          if (rows.length === 0) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = '<td class="text-center py-3" colspan="2">Участников нет</td>';
+            tbody.appendChild(tr);
+          }
+        } else {
+          alert('Ошибка удаления участника');
+        }
+      });
+    });
+    /*]]>*/
+  </script>
 </div>
 </body>
 </html>
