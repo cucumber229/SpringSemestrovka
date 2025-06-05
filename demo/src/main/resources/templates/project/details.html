@@ -194,7 +194,7 @@
 <script th:inline="javascript">
   /*<![CDATA[*/
   const projectId  = /*[[${project.id}]]*/ 0;
-  const csrfHeader = 'X-CSRF-TOKEN';
+  const csrfHeader = /*[['${_csrf.headerName}']]*/ 'X-CSRF-TOKEN';
   const csrfToken  = /*[['${_csrf.token}']]*/ '';
 
   // ---------- открыть модалку ----------
