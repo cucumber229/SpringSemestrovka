@@ -65,17 +65,12 @@
                 <tr th:each="u : ${team.members}">
                   <td th:text="${u.username}">username</td>
                   <td>
-                    <form th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}"
-                          th:action="@{|/teams/${team.id}/remove-user|}"
-                          method="post">
-                      <input type="hidden"
-                             th:name="${_csrf.parameterName}"
-                             th:value="${_csrf.token}" />
-                      <input type="hidden" name="userId" th:value="${u.id}" />
-                      <button type="submit" class="btn btn-sm btn-outline-danger">
-                        <i class="bi bi-person-dash me-1"></i> Убрать
-                      </button>
-                    </form>
+                    <button th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}"
+                            type="button"
+                            class="btn btn-sm btn-outline-danger js-remove-user"
+                            th:data-user-id="${u.id}">
+                      <i class="bi bi-person-dash me-1"></i> Убрать
+                    </button>
                   </td>
                 </tr>
                 <tr th:if="${#lists.isEmpty(team.members)}">
@@ -96,5 +91,30 @@
     </div>
   </div>
 </div>
+<script th:inline="javascript">
+  /*<![CDATA[*/
+  const teamId   = /*[[${team.id}]]*/ 0;
+  const csrfHdr  = /*[['${_csrf.headerName}']]*/ 'X-CSRF-TOKEN';
+  const csrfTok  = /*[['${_csrf.token}']]*/ '';
+
+  document.querySelectorAll('.js-remove-user').forEach(btn => {
+    btn.addEventListener('click', async e => {
+      e.preventDefault();
+      const userId = btn.dataset.userId;
+      const resp = await fetch(`/api/teams/${teamId}/users/${userId}`, {
+        method : 'DELETE',
+        headers: { [csrfHdr]: csrfTok }
+      });
+      if (resp.ok) {
+        btn.closest('tr').remove();
+      } else if (resp.status === 403) {
+        alert('Недостаточно прав для удаления');
+      } else {
+        alert('Ошибка удаления пользователя');
+      }
+    });
+  });
+  /*]]>*/
+</script>
 </body>
 </html>
