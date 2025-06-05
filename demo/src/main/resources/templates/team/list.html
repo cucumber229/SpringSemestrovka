@@ -23,7 +23,7 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h3 class="mb-0" th:text="${title}">Список команд</h3>
 
-                    <a th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}"
+                    <a th:if="${#authorization.expression('hasRole(''ADMIN'')')}"
                        th:href="@{/teams/admin}"
                        class="btn btn-warning d-flex align-items-center gap-1"
                        style="white-space: nowrap;">
@@ -58,7 +58,7 @@
                                         </a>
 
                                         <!-- Удаление -->
-                                        <form th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}"
+                                        <form th:if="${#authorization.expression('hasRole(''ADMIN'')')}"
                                               th:action="@{|/teams/${t.id}/delete|}"
                                               method="post"
                                               style="display: contents;">
