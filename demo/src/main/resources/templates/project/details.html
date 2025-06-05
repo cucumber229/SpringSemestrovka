@@ -16,6 +16,11 @@
 <body>
 <div layout:fragment="content">
   <div class="container mt-4">
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <h2 class="text-center mb-4">Детальная страница проекта</h2>
+      </div>
+    </div>
 
     <!-- ======= Карточка проекта ======= -->
     <div class="card shadow-sm mb-4">
@@ -27,29 +32,29 @@
       </div>
 
       <div class="card-body">
-        <p><strong>ID:</strong> <span th:text="${project.id}">1</span></p>
-        <p><strong>Название:</strong> <span th:text="${project.name}">Название</span></p>
-        <p><strong>Описание:</strong> <span th:text="${project.description}">Описание</span></p>
-        <p><strong>Владелец:</strong> <span th:text="${project.owner.username}">owner</span></p>
+        <dl class="row mb-0">
+          <dt class="col-sm-4">Название</dt>
+          <dd class="col-sm-8" th:text="${project.name}">Название</dd>
 
-        <p><strong>Приоритет:</strong>
-          <span th:switch="${project.priority}">
-            <span th:case="1">Низкий</span>
-            <span th:case="2">Средний</span>
-            <span th:case="3">Высокий</span>
-            <span th:case="*">—</span>
-          </span>
-        </p>
+          <dt class="col-sm-4">Описание</dt>
+          <dd class="col-sm-8" th:text="${project.description}">Описание</dd>
 
-        <p><strong>Команда:</strong>
-          <span th:text="${project.team != null ? project.team.name : '—'}">—</span>
-        </p>
+          <dt class="col-sm-4">Владелец</dt>
+          <dd class="col-sm-8" th:text="${project.owner.username}">owner</dd>
 
-        <p><strong>Дата создания:</strong>
-          <span th:text="${#temporals.format(project.createdAt,'dd.MM.yyyy HH:mm')}">
-            01.01.2025 00:00
-          </span>
-        </p>
+          <dt class="col-sm-4">Приоритет</dt>
+          <dd class="col-sm-8">
+            <span th:switch="${project.priority}">
+              <span th:case="1">Низкий</span>
+              <span th:case="2">Средний</span>
+              <span th:case="3">Высокий</span>
+              <span th:case="*">—</span>
+            </span>
+          </dd>
+
+          <dt class="col-sm-4">Команда</dt>
+          <dd class="col-sm-8" th:text="${project.team != null ? project.team.name : '—'}">—</dd>
+        </dl>
       </div>
 
       <div class="card-footer d-flex justify-content-between">
