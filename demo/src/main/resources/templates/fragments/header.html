@@ -67,6 +67,9 @@
           </span>
         </li>
         <li class="nav-item">
+          <a class="nav-link" th:href="@{/profile}" th:classappend="${activePage} == 'profile' ? ' active'">Профиль</a>
+        </li>
+        <li class="nav-item">
           <form th:action="@{/logout}" method="post" class="d-flex align-items-center">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
             <button type="submit" class="btn btn-link nav-link">Выйти</button>

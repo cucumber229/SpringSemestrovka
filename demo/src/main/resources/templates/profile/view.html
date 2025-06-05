@@ -1,0 +1,34 @@
+<!-- src/main/resources/templates/profile/view.html -->
+<!DOCTYPE html>
+<html lang="ru"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+  <title layout:fragment="title">Профиль</title>
+</head>
+<body>
+<div layout:fragment="content">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="card mt-5 shadow-sm">
+          <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">Профиль</h3>
+            <a th:href="@{/profile/edit}" class="btn btn-outline-light btn-sm">Редактировать</a>
+          </div>
+          <div class="card-body">
+            <dl class="row mb-0">
+              <dt class="col-sm-4">Имя</dt>
+              <dd class="col-sm-8" th:text="${profile.fullName}">—</dd>
+              <dt class="col-sm-4">О себе</dt>
+              <dd class="col-sm-8" th:text="${profile.bio}">—</dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

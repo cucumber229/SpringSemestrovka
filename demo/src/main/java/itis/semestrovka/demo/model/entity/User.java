@@ -41,6 +41,10 @@ public class User implements UserDetails {
     @ManyToMany(mappedBy = "participants")
     private Set<Task> tasks = new HashSet<>();
 
+    // Профиль пользователя
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private UserProfile profile;
+
     // --- UserDetails implementation ---
     @Override public Collection<Role> getAuthorities() { return Collections.singleton(role); }
     @Override public boolean isAccountNonExpired()  { return true; }
