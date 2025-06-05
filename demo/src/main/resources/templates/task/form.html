@@ -22,7 +22,7 @@
       </div>
       <div class="card-body">
         <form th:object="${task}"
-              th:action="@{|/projects/${projectId}/tasks${task.id == null ? '' : '/' + task.id}|}"
+              th:action="@{|/projects/${projectId}/tasks|}"
               method="post">
 
           <!-- ID при редактировании -->

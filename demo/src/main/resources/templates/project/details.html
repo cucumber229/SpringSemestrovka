@@ -32,7 +32,8 @@
         <a id="btnAddTask"
            class="btn-new-task"
            th:if="${project.owner.username == #authentication.name
-                    or #authorization.expression('hasRole(''ROLE_ADMIN'')')}"
+                    or #authorization.expression('hasRole(''ADMIN'')')}"
+
            th:href="@{|/projects/${project.id}/tasks/new|}">
           <span class="icon">➕</span>
           Новая задача
@@ -69,11 +70,13 @@
         </a>
         <div class="d-flex gap-3">
           <a th:if="${project.owner.username == #authentication.name
-                      or #authorization.expression('hasRole(''ROLE_ADMIN'')')}"
+
+                      or #authorization.expression('hasRole(''ADMIN'')')}"
              th:href="@{|/projects/${project.id}/edit|}"
              class="btn btn-outline-primary">Редактировать</a>
           <form th:if="${project.owner.username == #authentication.name
-                        or #authorization.expression('hasRole(''ROLE_ADMIN'')')}"
+                        or #authorization.expression('hasRole(''ADMIN'')')}"
+
                 th:action="@{|/projects/${project.id}/delete|}"
                 method="post"
                 class="d-inline">
@@ -114,8 +117,8 @@
               <a th:href="@{|/projects/${project.id}/tasks/${t.id}|}"
                  class="btn btn-sm btn-outline-secondary"
                  title="Просмотр">Просмотр</a>
-              <form th:if="${project.owner.username == #authentication.name
-                               or #authorization.expression('hasRole(''ROLE_ADMIN'')')}"
+              <form th:if="${project.owner.username == #authentication.name or #authorization.expression('hasRole(''ADMIN'')')}"
+
                     th:action="@{|/projects/${project.id}/tasks/${t.id}/delete|}"
                     method="post"
                     class="d-inline">

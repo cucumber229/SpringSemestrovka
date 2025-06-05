@@ -24,15 +24,15 @@
   <div class="card-header d-flex justify-content-between align-items-center">
     <h4 class="mb-0" th:text="'Задача «' + ${task.title} + '»'">Задача</h4>
 
-    <!-- Кнопки справа -->
-    <div class="d-flex gap-2"
-         th:if="${project.owner.username == #authentication.name or #authorization.expression('hasRole(''ROLE_ADMIN'')')}">
-      <!-- Редактировать -->
-      <a th:href="@{|/projects/${project.id}/tasks/${task.id}/edit|}"
-         class="btn btn-sm btn-warning text-white fw-semibold"
-         title="Редактировать">
-        <i class="bi bi-pencil"></i> Редактировать
-      </a>
+      <!-- Кнопки справа -->
+      <div class="d-flex gap-2"
+           th:if="${project.owner.username == #authentication.name or #authorization.expression('hasRole(''ADMIN'')')}">
+        <a th:href="@{|/projects/${project.id}/tasks/${task.id}/edit|}"
+           class="btn btn-sm btn-outline-light"
+           title="Редактировать">
+          <i class="bi bi-pencil"></i>
+        </a>
+
 
       <!-- Удалить -->
       <form th:action="@{|/projects/${project.id}/tasks/${task.id}/delete|}"
