@@ -141,6 +141,7 @@
           <div class="card-body">
             <form th:action="@{/profile}" th:object="${profile}" method="post">
               <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+              <input type="hidden" th:if="${profile.id != null}" th:field="*{id}"/>
               <div class="form-group mb-3">
                 <label for="fullName">Полное имя</label>
                 <input type="text" id="fullName" th:field="*{fullName}"/>
