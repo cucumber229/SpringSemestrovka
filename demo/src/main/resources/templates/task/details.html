@@ -1,108 +1,123 @@
-<!-- src/main/resources/templates/task/details.html -->
 <!DOCTYPE html>
 <html lang="ru"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout}">
+      layout:decorate="~{layout}"
+      xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
   <meta charset="UTF-8"/>
   <title layout:fragment="title"
-         th:text="'Задача «' + ${task.title} + '»'">
-    Задача
-  </title>
+         th:text="'Задача «' + ${task.title} + '»'">Задача</title>
+
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body>
 <div layout:fragment="content" class="mt-4">
 
-    <div class="row justify-content-center mb-4">
-      <div class="col-md-8">
-        <h2 class="text-center mb-4">Детальная страница задачи</h2>
-      </div>
+  <div class="row justify-content-center mb-4">
+    <div class="col-md-8">
+      <h2 class="text-center mb-4">Детали задачи</h2>
     </div>
+  </div>
 
-    <!-- ===== Карточка задачи ===== -->
-    <div class="card">
-      <div class="card-header">
-        <h4 class="mb-0" th:text="'Задача «' + ${task.title} + '»'">Задача</h4>
-      </div>
+  <!-- Карточка задачи -->
+  <div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h4 class="mb-0" th:text="'Задача «' + ${task.title} + '»'">Задача</h4>
 
-      <div class="card-body">
-        <dl class="row mb-0">
-          <dt class="col-sm-4">Статус</dt>
-          <dd class="col-sm-8" th:text="${task.status}">TODO</dd>
-
-          <dt class="col-sm-4">Описание</dt>
-          <dd class="col-sm-8" th:text="${task.description}">—</dd>
-
-          <dt class="col-sm-4">Исполнитель</dt>
-          <dd class="col-sm-8"
-              th:text="${task.assignedUser != null ? task.assignedUser.username : '—'}">—</dd>
-
-          <dt class="col-sm-4">Проект</dt>
-          <dd class="col-sm-8">
-            <a th:href="@{|/projects/${project.id}/view|}" th:text="${project.name}">Проект</a>
-          </dd>
-        </dl>
-      </div>
-
-      <!-- ==== Кнопки ==== -->
-      <div class="card-footer d-flex justify-content-between">
-        <a th:href="@{|/projects/${project.id}/view|}"
-           class="btn btn-outline-secondary">
-          ← К проекту
+      <!-- Кнопки справа -->
+      <div class="d-flex gap-2"
+           th:if="${project.owner.username == #authentication.name or #authentication.principal.role == 'ROLE_ADMIN'}">
+        <a th:href="@{|/projects/${project.id}/tasks/${task.id}/edit|}"
+           class="btn btn-sm btn-outline-light"
+           title="Редактировать">
+          <i class="bi bi-pencil"></i>
         </a>
 
-        <div th:if="${project.owner.username == #authentication.name
-                     or #authentication.principal.role == 'ROLE_ADMIN'}">
-          <a th:href="@{|/projects/${project.id}/tasks/${task.id}/edit|}"
-             class="btn btn-primary me-2">
-            Редактировать
-          </a>
-
-          <form th:action="@{|/projects/${project.id}/tasks/${task.id}/delete|}"
-                method="post">
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-            <button type="submit" class="btn btn-danger"
-                    onclick="return confirm('Удалить задачу?');">
-              Удалить
-            </button>
-          </form>
-        </div>
-      </div>
-    </div>
-    <!-- ===== /Карточка задачи ===== -->
-
-    <!-- ===== Комментарии ===== -->
-    <div class="card">
-      <div class="card-header">
-        <h5 class="mb-0">Комментарии</h5>
-      </div>
-      <ul class="list-group">
-        <li class="list-group-item" th:each="comment : ${comments}">
-          <a th:href="@{|/users/${comment.user.id}/profile|}">
-            <strong th:text="${comment.user.username}">user</strong>
-          </a>:
-          <span th:text="${comment.content}">content</span>
-          <small class="text-muted ms-2"
-                 th:text="${#temporals.format(comment.createdAt, 'dd.MM.yyyy HH:mm')}">date</small>
-        </li>
-        <li class="list-group-item" th:if="${#lists.isEmpty(comments)}">
-          Комментариев пока нет
-        </li>
-      </ul>
-
-      <!-- Форма добавления комментария -->
-      <div class="card-body" sec:authorize="isAuthenticated()">
-        <form th:action="@{|/projects/${project.id}/tasks/${task.id}/comments|}" method="post">
+        <form th:action="@{|/projects/${project.id}/tasks/${task.id}/delete|}"
+              method="post"
+              style="display: contents">
           <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-          <div class="mb-3">
-            <textarea name="content" rows="3" class="form-control" required></textarea>
-          </div>
-          <button type="submit" class="btn btn-primary">Добавить комментарий</button>
+          <button type="submit"
+                  class="btn btn-sm btn-outline-light"
+                  onclick="return confirm('Удалить задачу?');"
+                  title="Удалить">
+            <i class="bi bi-trash"></i>
+          </button>
         </form>
       </div>
     </div>
+
+    <div class="card-body">
+      <table class="table mb-0">
+        <tbody>
+        <tr>
+          <th style="width: 30%;">Статус</th>
+          <td th:text="${task.status}">IN_PROGRESS</td>
+        </tr>
+        <tr>
+          <th>Описание</th>
+          <td th:text="${task.description}">Описание</td>
+        </tr>
+        <tr>
+          <th>Исполнитель</th>
+          <td th:text="${task.assignedUser != null ? task.assignedUser.username : '—'}">123456</td>
+        </tr>
+        <tr>
+          <th>Проект</th>
+          <td>
+            <a th:href="@{|/projects/${project.id}/view|}" th:text="${project.name}">Проект</a>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card-footer text-start">
+      <a th:href="@{|/projects/${project.id}/view|}" class="btn btn-outline-secondary">
+        ← Назад к проекту
+      </a>
+    </div>
   </div>
+
+  <!-- Комментарии -->
+  <div class="card">
+    <div class="card-header">
+      <h5 class="mb-0">Комментарии</h5>
+    </div>
+
+    <div class="list-group list-group-flush">
+      <div class="list-group-item text-muted px-3 py-2 text-center"
+           th:if="${#lists.isEmpty(comments)}"
+           style="list-style: none;">
+        Комментариев пока нет
+      </div>
+
+      <div class="list-group-item" th:each="comment : ${comments}">
+        <div>
+          <a th:href="@{|/users/${comment.user.id}/profile|}">
+            <strong th:text="${comment.user.username}">Пользователь</strong>
+          </a>
+          <small class="text-muted ms-2"
+                 th:text="${#temporals.format(comment.createdAt, 'dd.MM.yyyy HH:mm')}">дата</small>
+        </div>
+        <div th:text="${comment.content}">Комментарий</div>
+      </div>
+    </div>
+
+    <div class="card-body" sec:authorize="isAuthenticated()">
+      <form th:action="@{|/projects/${project.id}/tasks/${task.id}/comments|}" method="post">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+        <div class="mb-3">
+          <textarea name="content" rows="3" class="form-control"
+                    placeholder="Напишите комментарий..." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Добавить комментарий</button>
+      </form>
+    </div>
+  </div>
+
 </div>
 </body>
 </html>

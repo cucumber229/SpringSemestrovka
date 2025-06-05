@@ -1,4 +1,3 @@
-<!-- src/main/resources/templates/team/list.html -->
 <!DOCTYPE html>
 <html lang="ru"
       xmlns:th="http://www.thymeleaf.org"
@@ -8,66 +7,86 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title layout:fragment="title" th:text="${title}">Список команд</title>
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 
 <body>
 <div layout:fragment="content" class="py-4">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-10">
+            <div class="card">
 
-        <div class="row justify-content-center mt-5">
-            <div class="col-md-10">
-                <div class="card">
-                    <!-- Шапка карточки -->
-                    <div class="card-header">
-                        <h3 class="mb-0" th:text="${title}">Список команд</h3>
-                        <!-- Кнопка «Управление командами» для ADMIN -->
-                        <a th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}"
-                           th:href="@{/teams/admin}"
-                           class="btn-admin btn-sm">Управление командами</a>
-                    </div>
+                <!-- Шапка карточки -->
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0" th:text="${title}">Список команд</h3>
 
-                    <!-- Тело карточки с таблицей -->
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover mb-0">
-                                <thead class="table-light">
-                                <tr>
-                                    <th scope="col">ID</th>
-                                    <th scope="col">Название</th>
-                                    <th scope="col">Участников</th>
-                                    <th scope="col" class="text-end">Действия</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr th:each="t : ${teams}">
-                                    <td th:text="${t.id}">1</td>
-                                    <td th:text="${t.name}">Название команды</td>
-                                    <td th:text="${t.members.size()} + ' чел.'">0 чел.</td>
-                                    <td class="text-end d-flex flex-wrap justify-content-end mb-1">
-                                        <!-- Кнопка «Просмотреть» -->
+                    <a th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}"
+                       th:href="@{/teams/admin}"
+                       class="btn btn-warning d-flex align-items-center gap-1"
+                       style="white-space: nowrap;">
+                        <i class="bi bi-gear"></i>
+                        Управление
+                    </a>
+                </div>
+
+
+                <!-- Таблица -->
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th>Название</th>
+                                <th style="width: 20%;">Участников</th>
+                                <th style="width: 25%;" class="text-end">Действия</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="t : ${teams}">
+                                <td th:text="${t.name}">Название команды</td>
+                                <td th:text="${t.members.size()} + ' чел.'">0 чел.</td>
+                                <td class="text-end">
+                                    <div class="d-flex justify-content-end align-items-center gap-2 flex-nowrap">
+                                        <!-- Просмотр -->
                                         <a th:href="@{|/teams/${t.id}/view|}"
-                                           class="btn-sm btn-outline-primary me-2 mb-1">Просмотреть</a>
-                                        <!-- Форма «Удалить» для ADMIN -->
+                                           class="btn btn-sm btn-outline-primary"
+                                           title="Просмотр">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+
+                                        <!-- Удаление -->
                                         <form th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}"
                                               th:action="@{|/teams/${t.id}/delete|}"
                                               method="post"
-                                              class="mb-1">
-                                            <button type="submit" class="btn-sm btn-outline-danger">Удалить</button>
+                                              style="display: contents;">
+                                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-outline-danger"
+                                                    onclick="return confirm('Удалить команду?');"
+                                                    title="Удалить">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
                                         </form>
-                                    </td>
-                                </tr>
-                                <tr th:if="${#lists.isEmpty(teams)}">
-                                    <td colspan="4" class="text-center py-3">Нет команд</td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                                    </div>
+                                </td>
+                            </tr>
 
-                    <!-- Футер карточки -->
-                    <div class="card-footer text-muted">
-                        Всего команд: <span th:text="${teams.size()}">0</span>
+                            <tr th:if="${#lists.isEmpty(teams)}">
+                                <td colspan="3" class="text-center py-3 text-muted">Нет команд</td>
+                            </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
+
+                <!-- Футер -->
+                <div class="card-footer text-end text-muted">
+                    Всего команд: <span th:text="${teams.size()}">0</span>
+                </div>
+
             </div>
         </div>
     </div>
