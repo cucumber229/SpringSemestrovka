@@ -114,11 +114,6 @@
               <a th:href="@{|/projects/${project.id}/tasks/${t.id}|}"
                  class="btn btn-sm btn-outline-secondary"
                  title="Просмотр">Просмотр</a>
-              <a th:if="${project.owner.username == #authentication.name
-                            or #authorization.expression('hasRole(''ROLE_ADMIN'')')}"
-                 th:href="@{|/projects/${project.id}/tasks/${t.id}/edit|}"
-                 class="btn btn-sm btn-outline-primary"
-                 title="Редактировать">Редактировать</a>
               <form th:if="${project.owner.username == #authentication.name
                                or #authorization.expression('hasRole(''ROLE_ADMIN'')')}"
                     th:action="@{|/projects/${project.id}/tasks/${t.id}/delete|}"
