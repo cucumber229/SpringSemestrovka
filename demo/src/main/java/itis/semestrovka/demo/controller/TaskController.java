@@ -128,6 +128,7 @@ public class TaskController {
                 : List.of(project.getOwner());
 
         model.addAttribute("task", taskService.findById(id));
+        model.addAttribute("project", project);
         model.addAttribute("projectId", projectId);
         model.addAttribute("candidates", candidates);
         return "task/form";
