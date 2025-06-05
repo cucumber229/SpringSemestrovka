@@ -73,14 +73,25 @@ public class TeamController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/save")
     public String save(
-            @Valid @ModelAttribute("team") Team team,
+            @Valid @ModelAttribute("team") Team formTeam,
             BindingResult br,
             Model model
     ) {
         if (br.hasErrors()) {
-            model.addAttribute("title", (team.getId() == null) ? "Новая команда" : "Редактирование команды");
+            model.addAttribute("title",
+                    (formTeam.getId() == null) ? "Новая команда" : "Редактирование команды");
             return "team/form";
         }
+
+        Team team;
+        if (formTeam.getId() != null) {
+            team = teamService.findById(formTeam.getId());
+            team.setName(formTeam.getName());
+            team.setDescription(formTeam.getDescription());
+        } else {
+            team = formTeam;
+        }
+
         teamService.create(team);
         return "redirect:/teams/admin";
     }
