@@ -28,7 +28,7 @@
 
       <!-- Кнопки справа -->
       <div class="d-flex gap-2"
-           th:if="${project.owner.username == #authentication.name or #authentication.principal.role == 'ROLE_ADMIN'}">
+           th:if="${project.owner.username == #authentication.name or #authorization.expression('hasRole(''ADMIN'')')}">
         <a th:href="@{|/projects/${project.id}/tasks/${task.id}/edit|}"
            class="btn btn-sm btn-outline-light"
            title="Редактировать">
@@ -65,6 +65,20 @@
           <td th:text="${task.assignedUser != null ? task.assignedUser.username : '—'}">123456</td>
         </tr>
         <tr>
+          <th>Исполнители</th>
+          <td id="participantsContainer">
+            <span th:if="${#lists.isEmpty(task.participants)}">—</span>
+            <span th:each="p,iter : ${task.participants}" class="participant-item me-2">
+              <span th:text="${p.username}"></span>
+              <button type="button"
+                      class="btn btn-sm btn-link text-danger p-0 btn-remove-participant"
+                      th:data-user-id="${p.id}"
+                      th:if="${project.owner.username == #authentication.name or #authorization.expression('hasRole(''ADMIN'')')}">×</button>
+              <span th:if="${!iter.last}">, </span>
+            </span>
+          </td>
+        </tr>
+        <tr>
           <th>Проект</th>
           <td>
             <a th:href="@{|/projects/${project.id}/view|}" th:text="${project.name}">Проект</a>
@@ -74,9 +88,12 @@
       </table>
     </div>
 
-    <div class="card-footer text-start">
+    <div class="card-footer d-flex justify-content-between">
       <a th:href="@{|/projects/${project.id}/view|}" class="btn btn-outline-secondary">
-        ← Назад к проекту
+        ← В проект
+      </a>
+      <a th:href="@{/tasks}" class="btn btn-outline-secondary">
+        Ко всем задачам
       </a>
     </div>
   </div>
@@ -119,5 +136,35 @@
   </div>
 
 </div>
+
+<script th:inline="javascript">
+  /*<![CDATA[*/
+  const projectId  = /*[[${project.id}]]*/ 0;
+  const taskId     = /*[[${task.id}]]*/ 0;
+  const csrfHeader = /*[['${_csrf.headerName}']]*/ 'X-CSRF-TOKEN';
+  const csrfToken  = /*[['${_csrf.token}']]*/ '';
+
+  document.querySelectorAll('.btn-remove-participant').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if (!confirm('Удалить исполнителя из задачи?')) return;
+      const userId = btn.dataset.userId;
+      const resp = await fetch(`/projects/${projectId}/tasks/${taskId}/participants/${userId}/delete`, {
+        method: 'POST',
+        headers: { [csrfHeader]: csrfToken }
+      });
+      if (resp.ok) {
+        const item = btn.closest('.participant-item');
+        item.remove();
+        const container = document.getElementById('participantsContainer');
+        if (container.querySelectorAll('.participant-item').length === 0) {
+          container.textContent = '—';
+        }
+      } else {
+        alert('Ошибка удаления исполнителя');
+      }
+    });
+  });
+  /*]]>*/
+</script>
 </body>
 </html>
