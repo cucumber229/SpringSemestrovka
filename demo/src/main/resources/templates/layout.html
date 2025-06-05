@@ -10,9 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
 
-  <!-- Bootstrap -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-PCsY2cCstxGFGr2PzefRg2fzGEylh4G6dkprdFM5lTyBC0bY4Z1cdq9VHtV6fRvK" crossorigin="anonymous">
+  <!-- Custom styles instead of Bootstrap -->
 
   <link rel="stylesheet" th:href="@{/css/style.css}"/>
 </head>
@@ -30,9 +28,7 @@
   <div th:replace="fragments/footer :: footer"></div>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-PkRkNvztNFVQVw1Gc7YCOUMIqFZRMVAb9YSEvum33jjXNMTvEihQ/HUkNzxaz2Ys"
-        crossorigin="anonymous"></script>
+  <script th:src="@{/js/app.js}"></script>
 
 </body>
 </html>
