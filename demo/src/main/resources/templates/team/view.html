@@ -94,7 +94,9 @@
 <script th:inline="javascript">
   /*<![CDATA[*/
   const teamId   = /*[[${team.id}]]*/ 0;
+
   const csrfHdr  = /*[['${_csrf.headerName}']]*/ 'X-CSRF-TOKEN';
+
   const csrfTok  = /*[['${_csrf.token}']]*/ '';
 
   document.querySelectorAll('.js-remove-user').forEach(btn => {
