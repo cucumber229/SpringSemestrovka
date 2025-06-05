@@ -133,20 +133,22 @@ public class TaskController {
     @GetMapping("/{id}")
     public String view(@PathVariable Long projectId,
                        @PathVariable Long id,
-                       Model model) {
+                       Model model,
+                       @AuthenticationPrincipal User currentUser) {
 
         Task    task    = taskService.findById(id);
         Project project = projectService.findById(projectId);
         List<Comment> comments = commentService.findAllByTaskId(id);
 
-        // доступ: владелец проекта, любой из команды или ADMIN
-        boolean allowed =
-                task.getProject().getOwner().getId().equals(project.getOwner().getId()) ||
-                        (project.getTeam() != null && project.getTeam().getMembers()
-                                .contains(project.getOwner())) ||
-                        SecurityContextHolder.getContext().getAuthentication()
-                                .getAuthorities().stream()
-                                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        boolean isAdmin = SecurityContextHolder.getContext().getAuthentication()
+                .getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        boolean isOwner = project.getOwner().getId().equals(currentUser.getId());
+        boolean isAssigned = (task.getAssignedUser() != null && task.getAssignedUser().getId().equals(currentUser.getId()))
+                || task.getParticipants().contains(currentUser);
+        boolean isTeamMember = project.getTeam() != null && project.getTeam().getMembers().contains(currentUser);
+
+        boolean allowed = isOwner || isAdmin || (isTeamMember && isAssigned);
 
         if (!allowed) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
