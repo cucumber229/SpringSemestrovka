@@ -1,133 +1,83 @@
 <!-- templates/fragments/header.html -->
 <th:block th:fragment="header">
+  <head>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  </head>
 
-  <nav
-     xmlns:th="http://www.thymeleaf.org"
-     xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
-     class="navbar">
-  <div class="container">
-    <!-- ======== ЛОГОТИП ======== -->
-    <a class="navbar-brand" th:href="@{/projects}">TeamManager</a>
+  <nav class="navbar navbar-expand-lg bg-light border-bottom"
+       xmlns:th="http://www.thymeleaf.org"
+       xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+    <div class="container d-flex justify-content-between align-items-center">
 
-    <!-- ======== Основная навигация (большие экраны) ======== -->
-    <ul class="navbar-nav">
-      <li class="nav-item">
-        <a class="nav-link" th:href="@{/projects}"
-           th:classappend="${activePage} == 'projects' ? ' active'">
-          Проекты
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" th:href="@{/tasks}"
-           th:classappend="${activePage} == 'tasks' ? ' active'">
-          Задачи
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" th:href="@{/teams}"
-           th:classappend="${activePage} == 'teams' ? ' active'">
-          Команды
-        </a>
-      </li>
-    </ul>
+      <!-- Логотип -->
+      <a class="navbar-brand fw-bold" th:href="@{/projects}">TeamManager</a>
 
-    <!-- ======== Блок авторизации (большие экраны) ======== -->
-    <div class="auth-nav">
-      <!-- Если гость -->
-      <ul class="navbar-nav" sec:authorize="isAnonymous()">
+      <!-- Навигация -->
+      <ul class="navbar-nav flex-row gap-3">
         <li class="nav-item">
-          <a class="nav-link" th:href="@{/login}"
-             th:classappend="${activePage} == 'login' ? ' active'">
-            Войти
+          <a class="nav-link" th:href="@{/projects}"
+             th:classappend="${activePage} == 'projects' ? ' active fw-semibold'">
+            Проекты
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" th:href="@{/register}"
-             th:classappend="${activePage} == 'register' ? ' active'">
-            Регистрация
+          <a class="nav-link" th:href="@{/tasks}"
+             th:classappend="${activePage} == 'tasks' ? ' active fw-semibold'">
+            Задачи
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" th:href="@{/teams}"
+             th:classappend="${activePage} == 'teams' ? ' active fw-semibold'">
+            Команды
           </a>
         </li>
       </ul>
 
-      <!-- Если аутентифицирован -->
-      <ul class="navbar-nav" sec:authorize="isAuthenticated()">
-        <li class="nav-item navbar-text">
-          Привет, <strong sec:authentication="name"></strong>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" th:href="@{/profile}"
-             th:classappend="${activePage} == 'profile' ? ' active'">
-            Профиль
-          </a>
-        </li>
-        <li class="nav-item">
-          <form th:action="@{/logout}" method="post">
-            <input type="hidden" th:name="${_csrf.parameterName}"
-                   th:value="${_csrf.token}"/>
-            <button type="submit" class="btn btn-link nav-link">Выйти</button>
-          </form>
-        </li>
-      </ul>
+      <!-- Авторизация -->
+      <div class="d-flex align-items-center gap-3">
+
+        <!-- Гость -->
+        <ul class="navbar-nav flex-row gap-2" sec:authorize="isAnonymous()">
+          <li class="nav-item">
+            <a class="nav-link" th:href="@{/login}"
+               th:classappend="${activePage} == 'login' ? ' active fw-semibold'">
+              Войти
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" th:href="@{/register}"
+               th:classappend="${activePage} == 'register' ? ' active fw-semibold'">
+              Регистрация
+            </a>
+          </li>
+        </ul>
+
+        <!-- Аутентифицированный пользователь -->
+        <ul class="navbar-nav flex-row align-items-center gap-3" sec:authorize="isAuthenticated()">
+          <li class="nav-item navbar-text">
+            Привет, <strong sec:authentication="name"></strong>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" th:href="@{/profile}"
+               th:classappend="${activePage} == 'profile' ? ' active fw-semibold'">
+              Профиль
+            </a>
+          </li>
+          <li class="nav-item">
+            <form th:action="@{/logout}" method="post" class="m-0">
+              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+              <button type="submit" class="btn btn-sm btn-danger fw-semibold text-white">
+                Выйти
+              </button>
+            </form>
+          </li>
+        </ul>
+
+      </div>
     </div>
-
-    <!-- ======== Кнопка-гамбургер для мобильных ======== -->
-    <button class="navbar-toggler" type="button" aria-controls="navbarMenu"
-            aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"><div></div></span>
-    </button>
-  </div>
-
-  <!-- ======== Мобильное меню ======== -->
-  <div class="navbar-collapse" id="navbarMenu">
-    <ul class="navbar-nav">
-      <li class="nav-item">
-        <a class="nav-link" th:href="@{/projects}"
-           th:classappend="${activePage} == 'projects' ? ' active'">
-          Проекты
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" th:href="@{/tasks}"
-           th:classappend="${activePage} == 'tasks' ? ' active'">
-          Задачи
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" th:href="@{/teams}"
-           th:classappend="${activePage} == 'teams' ? ' active'">
-          Команды
-        </a>
-      </li>
-
-      <!-- Мобильное авторизационное меню -->
-      <li class="nav-item" sec:authorize="isAnonymous()">
-        <a class="nav-link" th:href="@{/login}"
-           th:classappend="${activePage} == 'login' ? ' active'">
-          Войти
-        </a>
-      </li>
-      <li class="nav-item" sec:authorize="isAnonymous()">
-        <a class="nav-link" th:href="@{/register}"
-           th:classappend="${activePage} == 'register' ? ' active'">
-          Регистрация
-        </a>
-      </li>
-      <li class="nav-item" sec:authorize="isAuthenticated()">
-        <a class="nav-link" th:href="@{/profile}"
-           th:classappend="${activePage} == 'profile' ? ' active'">
-          Профиль
-        </a>
-      </li>
-      <li class="nav-item" sec:authorize="isAuthenticated()">
-        <form th:action="@{/logout}" method="post">
-          <input type="hidden" th:name="${_csrf.parameterName}"
-                 th:value="${_csrf.token}"/>
-          <button type="submit" class="btn btn-link nav-link">
-            Выйти
-          </button>
-        </form>
-      </li>
-    </ul>
-  </div>
   </nav>
 </th:block>

@@ -16,28 +16,24 @@
     <div class="container mt-4">
 
         <!-- ===== ФИЛЬТР ===== -->
-        <div class="row justify-content-between align-items-center mb-3">
-            <div class="col-md-auto">
-                <form th:action="@{/projects}" method="get" class="row g-2 align-items-center">
+        <div class="row mb-3">
+            <div class="col-auto">
+                <form th:action="@{/projects}" method="get" class="d-flex align-items-center gap-2">
                     <input type="hidden" name="sortField" th:value="${sortField}"/>
                     <input type="hidden" name="sortDir" th:value="${sortDir}"/>
 
-                    <div class="col-auto">
-                        <label for="typeSelect" class="col-form-label"><strong>Тип:</strong></label>
-                    </div>
-                    <div class="col-auto">
-                        <select id="typeSelect" name="type" class="form-select" th:onchange="this.form.submit()">
-                            <option value="all" th:selected="${type == 'all'}">— Все —</option>
-                            <option value="team" th:selected="${type == 'team'}">Командные</option>
-                            <option value="personal" th:selected="${type == 'personal'}">Личные</option>
-                        </select>
-                    </div>
-                    <div class="col-auto">
-                        <button type="submit" class="btn btn-primary">Применить</button>
-                    </div>
+                    <label for="typeSelect" class="form-label mb-0"><strong>Тип:</strong></label>
+                    <select id="typeSelect" name="type"
+                            class="form-select form-select-sm"
+                            th:onchange="this.form.submit()">
+                        <option value="all" th:selected="${type == 'all'}">Все</option>
+                        <option value="team" th:selected="${type == 'team'}">Командные</option>
+                        <option value="personal" th:selected="${type == 'personal'}">Личные</option>
+                    </select>
                 </form>
             </div>
         </div>
+
 
         <!-- ===== ТАБЛИЦА ===== -->
         <div class="row justify-content-center">
