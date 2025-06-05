@@ -22,7 +22,7 @@
       </div>
       <div class="card-body">
         <form th:object="${task}"
-              th:action="@{|/projects/${projectId}/tasks${task.id == null ? '' : '/' + task.id}|}"
+              th:action="@{|/projects/${projectId}/tasks|}"
               method="post">
 
           <!-- ID при редактировании -->
@@ -68,10 +68,22 @@
             </select>
           </div>
 
+          <!-- Исполнители (можно выбрать несколько) -->
+          <div class="mb-3" th:if="${#lists.size(candidates) > 1}">
+            <label for="participantIds" class="form-label">Исполнители</label>
+            <select id="participantIds" name="participantIds" multiple class="form-select">
+              <option th:each="u : ${candidates}"
+                      th:value="${u.id}"
+                      th:text="${u.username}"
+                      th:selected="${task.participants.contains(u)}">
+              </option>
+            </select>
+          </div>
+
           <!-- Кнопки -->
           <div class="d-flex justify-content-between">
             <button type="submit" class="btn btn-primary">Сохранить</button>
-            <a th:href="@{|/projects/${projectId}/view|}" class="btn btn-outline-secondary">Отмена</a>
+            <a href="#" onclick="history.back(); return false;" class="btn btn-outline-secondary">Отмена</a>
           </div>
         </form>
       </div>
