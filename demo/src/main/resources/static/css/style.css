@@ -7,28 +7,28 @@ body {
     min-height: 100vh;
 }
 
-.navbar,
-.footer {
+.tm-navbar,
+.tm-footer {
 
     background: linear-gradient(90deg, #00b4db, #0083b0);
 
 }
 
-.navbar a,
-.footer {
+.tm-navbar a,
+.tm-footer {
     color: #ffffff !important;
 }
 
 
 
-.card {
+.tm-card {
     border: none;
     border-radius: 1.25rem;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     transition: transform .12s;
 }
 
-.card:hover {
+.tm-card:hover {
     transform: translateY(-3px);
 }
 
@@ -46,7 +46,7 @@ body {
     color: #fff;
 }
 
-.footer {
+.tm-footer {
     font-size: 0.95rem;
     letter-spacing: 0.05em;
     margin-top: 48px;
@@ -57,14 +57,14 @@ main {
     margin-top: 2rem;
 }
 /* Стили для интерактивного hover-текста и underline только в header */
-header .nav-link {
+header .tm-nav-link {
     position: relative;
     color: #ffffff;                /* исходный цвет текста в шапке */
     transition: color 0.3s ease;   /* плавное изменение цвета при наведении */
 }
 
 /* «Подчёркивающая» полоса под ссылкой (изначально скрыта) */
-header .nav-link::after {
+header .tm-nav-link::after {
     content: "";
     position: absolute;
     left: 0;
@@ -76,26 +76,26 @@ header .nav-link::after {
 }
 
 /* При наведении на ссылку */
-header .nav-link:hover {
+header .tm-nav-link:hover {
     color: #ffd700;                /* цвет текста при hover (золотистый) */
 }
 
-header .nav-link:hover::after {
+header .tm-nav-link:hover::after {
     width: 100%;                   /* растягиваем полосу на всю ширину ссылки */
 }
 
 /* Для активной ссылки (класс active, устанавливаемый Thymeleaf) */
-header .nav-link.active {
+header .tm-nav-link.active {
     color: #ffd700;                /* цвет текста активной ссылки */
 }
 
-header .nav-link.active::after {
+header .tm-nav-link.active::after {
     width: 100%;
     background-color: #ffd700;     /* цвет линии у активной ссылки */
 }
 
 /* Простая модалка без Bootstrap */
-.modal {
+.tm-modal {
     display: none;
     position: fixed;
     inset: 0;
@@ -103,10 +103,10 @@ header .nav-link.active::after {
     align-items: center;
     justify-content: center;
 }
-.modal.show {
+.tm-modal.show {
     display: flex;
 }
-.modal-dialog {
+.tm-modal-dialog {
     background: #fff;
     padding: 1rem;
     border-radius: .5rem;
@@ -115,16 +115,16 @@ header .nav-link.active::after {
 }
 
 /* Простое меню навигации */
-.navbar-toggler {
+.tm-navbar-toggler {
     cursor: pointer;
     border: none;
     background: transparent;
 }
 
-.navbar-collapse {
+.tm-navbar-collapse {
     display: none;
 }
 
-.navbar-collapse.show {
+.tm-navbar-collapse.show {
     display: block;
 }
