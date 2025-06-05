@@ -106,7 +106,7 @@
                                             </a>
 
                                             <!-- Кнопка-мусорка -->
-                                            <form th:if="${p.owner.username == #authentication.name or #authentication.principal.role == 'ROLE_ADMIN'}"
+                                            <form th:if="${p.owner.username == #authentication.name or #authorization.expression('hasRole(''ROLE_ADMIN'')')}"
                                                   th:action="@{|/projects/${p.id}/delete|}"
                                                   method="post"
                                                   class="m-0 p-0 border-0 d-inline"
