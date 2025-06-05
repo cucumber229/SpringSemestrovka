@@ -45,19 +45,6 @@
                                             <i class="bi bi-eye me-1"></i> Просмотреть
                                         </a>
 
-                                        <!-- Кнопка «Редактировать» для ADMIN -->
-                                        <a th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}"
-                                           th:href="@{|/teams/${t.id}/edit|}"
-                                           class="btn btn-sm btn-outline-secondary me-2 mb-1">
-                                            <i class="bi bi-pencil me-1"></i> Ред.
-                                        </a>
-
-                                        <!-- Кнопка «Добавить участника» для ADMIN -->
-                                        <a th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}"
-                                           th:href="@{|/teams/${t.id}/add-user|}"
-                                           class="btn btn-sm btn-outline-success me-2 mb-1">
-                                            <i class="bi bi-person-plus me-1"></i> Добавить
-                                        </a>
 
                                         <!-- Форма «Удалить» для ADMIN -->
                                         <form th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}"
