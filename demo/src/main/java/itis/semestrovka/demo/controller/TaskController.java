@@ -92,11 +92,22 @@ public class TaskController {
             task.setAssignedUser(null);
         }
 
-        // Назначение участников задачи (M2M)
+        // Назначение участников задачи (M2M) только из членов команды
         Set<User> participants = new HashSet<>();
         if (participantIds != null) {
+            Set<Long> allowed = new HashSet<>();
+            if (project.getTeam() != null) {
+                for (User u : project.getTeam().getMembers()) {
+                    allowed.add(u.getId());
+                }
+            } else {
+                allowed.add(project.getOwner().getId());
+            }
             for (Long uid : participantIds) {
-                participants.add(userService.findById(uid));
+                if (allowed.contains(uid)) {
+                    participants.add(userService.findById(uid));
+                }
+
             }
         }
         task.setParticipants(participants);

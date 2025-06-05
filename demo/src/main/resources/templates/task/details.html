@@ -66,7 +66,8 @@
           <td th:text="${task.assignedUser != null ? task.assignedUser.username : '—'}">123456</td>
         </tr>
         <tr>
-          <th>Участники</th>
+          <th>Исполнители</th>
+
           <td>
             <span th:if="${#lists.isEmpty(task.participants)}">—</span>
             <span th:each="p,iter : ${task.participants}">
