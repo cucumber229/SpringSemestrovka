@@ -3,7 +3,18 @@ package itis.semestrovka.demo.service;
 
 import itis.semestrovka.demo.model.dto.RegistrationForm;
 import itis.semestrovka.demo.model.entity.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
-public interface UserService {
+/**
+ * Сервис работы с пользователями.
+ * Наследуется от {@link UserDetailsService}, чтобы Spring-Security
+ * мог использовать его для загрузки пользователя по username.
+ */
+public interface UserService extends UserDetailsService {
+
+    /** Регистрация нового пользователя */
     User register(RegistrationForm form);
+
+    /** Найти пользователя по id (или бросить исключение) */
+    User findById(Long id);
 }

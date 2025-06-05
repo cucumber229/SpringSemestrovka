@@ -131,13 +131,7 @@
                                                 <i class="bi bi-eye"></i>
                                             </a>
 
-                                            <!-- Редактировать – только владелец или ADMIN -->
-                                            <a th:if="${p.owner.username == #authentication.name or #authentication.principal.role == 'ROLE_ADMIN'}"
-                                               th:href="@{|/projects/${p.id}/edit|}"
-                                               class="btn btn-sm btn-outline-primary me-2"
-                                               title="Редактировать">
-                                                <i class="bi bi-pencil"></i>
-                                            </a>
+
 
                                             <!-- Удалить – только владелец или ADMIN -->
                                             <form th:if="${p.owner.username == #authentication.name or #authentication.principal.role == 'ROLE_ADMIN'}"

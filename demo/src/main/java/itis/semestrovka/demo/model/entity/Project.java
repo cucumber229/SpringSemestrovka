@@ -8,47 +8,49 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "projects")
-@Getter
-@Setter
-@NoArgsConstructor
+@Getter @Setter @NoArgsConstructor
 public class Project {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Название проекта — обязательно
-    @Column(nullable = false)
+    /* ======= Основные поля ======= */
+
     @NotBlank
+    @Column(nullable = false)
     private String name;
 
-    // Описание — опционально
     private String description;
 
-    // Дата создания (инициируется автоматически при создании объекта)
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    /** Новое поле: приоритет проекта (1 – Низкий, 2 – Средний, 3 – Высокий) */
-    @Column(name = "priority", nullable = false)
     @NotNull
-    private Integer priority = 1;
+    @Column(nullable = false)
+    private Integer priority = 1;          // 1 – низкий, 2 – средний, 3 – высокий
 
-    /**
-     * Связь «многие-к-одному» к Team.
-     * Для личных проектов `team` может быть null, поэтому nullable = true.
-     */
+    /* ======= Связи ======= */
+
+    // (nullable=true) → личный или командный
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "team_id", nullable = true)
+    @JoinColumn(name = "team_id")
     private Team team;
 
-    /**
-     * Связь «многие-к-одному» к владельцу (owner) — обязательно.
-     * Здесь nullable = false, так как у любого проекта должен быть владелец.
-     */
+    // владелец всегда обязателен
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
+
+    // список задач проекта  <——  ЭТО НОВОЕ
+    @OneToMany(mappedBy = "project",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY)
+    private List<Task> tasks = new ArrayList<>();
 }

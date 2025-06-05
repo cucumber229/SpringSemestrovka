@@ -1,0 +1,78 @@
+<!-- src/main/resources/templates/task/details.html -->
+<!DOCTYPE html>
+<html lang="ru"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+
+<head>
+  <meta charset="UTF-8"/>
+  <title layout:fragment="title"
+         th:text="'Задача «' + ${task.title} + '»'">
+    Задача
+  </title>
+</head>
+
+<body>
+<div layout:fragment="content">
+  <div class="container mt-4">
+
+    <!-- ===== Карточка задачи ===== -->
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-primary text-white">
+        <h4 class="mb-0" th:text="'Задача «' + ${task.title} + '»'">Задача</h4>
+      </div>
+
+      <div class="card-body">
+        <p><strong>ID:</strong> <span th:text="${task.id}">1</span></p>
+        <p><strong>Статус:</strong> <span th:text="${task.status}">TODO</span></p>
+        <p><strong>Описание:</strong> <span th:text="${task.description}">—</span></p>
+
+        <p><strong>Исполнитель:</strong>
+          <span th:text="${task.assignedUser != null ? task.assignedUser.username : '—'}">—</span>
+        </p>
+
+        <p><strong>Проект:</strong>
+          <a th:href="@{|/projects/${project.id}/view|}"
+             th:text="${project.name}">Проект</a>
+        </p>
+
+        <p><strong>Дата создания:</strong>
+          <span th:text="${#temporals.format(task.createdAt,'dd.MM.yyyy HH:mm')}">
+            01.01.2025 00:00
+          </span>
+        </p>
+      </div>
+
+      <!-- ==== Кнопки ==== -->
+      <div class="card-footer d-flex justify-content-between">
+        <a th:href="@{|/projects/${project.id}/view|}"
+           class="btn btn-outline-secondary">
+          ← К&nbsp;проекту
+        </a>
+
+        <div th:if="${project.owner.username == #authentication.name
+                     or #authentication.principal.role == 'ROLE_ADMIN'}">
+          <a th:href="@{|/projects/${project.id}/tasks/${task.id}/edit|}"
+             class="btn btn-primary me-2">
+            Редактировать
+          </a>
+
+          <form th:action="@{|/projects/${project.id}/tasks/${task.id}/delete|}"
+                method="post" style="display:inline;">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <button type="submit" class="btn btn-danger"
+                    onclick="return confirm('Удалить задачу?');">
+              Удалить
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!-- ===== /Карточка задачи ===== -->
+
+    <!-- Здесь позже можно вывести комментарии, вложения и т.п. -->
+  </div>
+</div>
+</body>
+</html>

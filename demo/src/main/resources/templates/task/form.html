@@ -1,0 +1,85 @@
+<!-- src/main/resources/templates/task/form.html -->
+<!DOCTYPE html>
+<html lang="ru"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+  <meta charset="UTF-8"/>
+  <title layout:fragment="title"
+         th:text="${task.id == null ? 'Новая задача' : 'Редактирование задачи'}">
+    Задача
+  </title>
+</head>
+<body>
+<div layout:fragment="content">
+  <div class="container mt-4">
+    <div class="card shadow-sm">
+      <div class="card-header bg-primary text-white">
+        <h3 class="mb-0"
+            th:text="${task.id == null ? 'Новая задача' : 'Редактирование задачи'}">
+          Задача
+        </h3>
+      </div>
+
+      <div class="card-body">
+        <form th:object="${task}"
+              th:action="@{|/projects/${projectId}/tasks${task.id == null ? '' : '/' + task.id}|}"
+              method="post">
+
+          <!-- ID при редактировании -->
+          <input type="hidden" th:if="${task.id != null}" th:field="*{id}"/>
+
+          <!-- ===== Название ===== -->
+          <div class="mb-3">
+            <label for="title" class="form-label">Название</label>
+            <input id="title" type="text" class="form-control"
+                   th:field="*{title}" placeholder="Введите заголовок" required>
+            <div class="text-danger" th:errors="*{title}"></div>
+          </div>
+
+          <!-- ===== Описание ===== -->
+          <div class="mb-3">
+            <label for="description" class="form-label">Описание</label>
+            <textarea id="description" class="form-control" rows="3"
+                      th:field="*{description}" placeholder="Описание"></textarea>
+            <div class="text-danger" th:errors="*{description}"></div>
+          </div>
+
+          <!-- ===== Статус ===== -->
+          <div class="mb-3">
+            <label for="status" class="form-label">Статус</label>
+            <select id="status" class="form-select" th:field="*{status}" required>
+              <option value="TODO">TODO</option>
+              <option value="IN_PROGRESS">В работе</option>
+              <option value="DONE">Готово</option>
+            </select>
+            <div class="text-danger" th:errors="*{status}"></div>
+          </div>
+
+          <!-- ===== Исполнитель (если кандидатов > 1) ===== -->
+          <div class="mb-3" th:if="${#lists.size(candidates) > 1}">
+            <label for="assigneeId" class="form-label">Исполнитель</label>
+            <select id="assigneeId" name="assigneeId" class="form-select">
+              <option value="">– не назначен –</option>
+              <option th:each="u : ${candidates}"
+                      th:value="${u.id}"
+                      th:text="${u.username}"
+                      th:selected="${task.assignedUser != null && u.id == task.assignedUser.id}">
+              </option>
+            </select>
+          </div>
+
+          <!-- ===== Кнопки ===== -->
+          <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+            <a th:href="@{|/projects/${projectId}/view|}"
+               class="btn btn-outline-secondary">Отмена</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

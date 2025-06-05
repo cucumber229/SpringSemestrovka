@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -24,4 +25,7 @@ public class Team {
     private String name;
     private String description;
     private LocalDateTime createdAt = LocalDateTime.now();
+    public List<User> getMembers() {
+        return List.copyOf(members);   // IntelliJ больше не ругается
+    }
 }

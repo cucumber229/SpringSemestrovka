@@ -6,22 +6,31 @@
       layout:decorate="~{layout}">
 <head>
   <meta charset="UTF-8"/>
-  <title layout:fragment="title"
-         th:text="${title}">Форма проекта</title>
+  <title layout:fragment="title" th:text="${title}">Форма проекта</title>
 </head>
+
 <body>
 <div layout:fragment="content">
   <div class="container mt-4">
     <div class="card shadow-sm">
-      <div class="card-header bg-primary text-white">
-        <h3 class="mb-0" th:text="${title}">Форма</h3>
-      </div>
-      <div class="card-body">
-        <form th:action="@{/projects}" th:object="${project}" method="post">
-          <!-- Если редактируем уже созданный проект -->
-          <input type="hidden" th:if="${project.id != null}" th:field="*{id}"/>
 
-          <!-- Название -->
+      <div class="card-header bg-primary text-white">
+        <h3 class="mb-0" th:text="${title}">Форма проекта</h3>
+      </div>
+
+      <div class="card-body">
+
+        <!-- ======= ФОРМА ======= -->
+        <form th:action="@{/projects}"
+              th:object="${project}"
+              method="post">
+
+          <!-- id (только при редактировании) -->
+          <input type="hidden"
+                 th:if="${project.id != null}"
+                 th:field="*{id}"/>
+
+          <!-- ======= Название ======= -->
           <div class="mb-3">
             <label for="name" class="form-label">Название</label>
             <input type="text"
@@ -29,75 +38,83 @@
                    class="form-control"
                    th:field="*{name}"
                    placeholder="Введите название проекта"
-                   required/>
-            <div class="text-danger" th:if="${#fields.hasErrors('name')}"
+                   required>
+            <div class="text-danger"
+                 th:if="${#fields.hasErrors('name')}"
                  th:errors="*{name}">Ошибка
             </div>
           </div>
 
-          <!-- Описание -->
+          <!-- ======= Описание ======= -->
           <div class="mb-3">
             <label for="description" class="form-label">Описание</label>
             <textarea id="description"
                       class="form-control"
                       th:field="*{description}"
                       rows="3"
-                      placeholder="Описание проекта"></textarea>
-            <div class="text-danger" th:if="${#fields.hasErrors('description')}"
+                      placeholder="Краткое описание проекта"></textarea>
+            <div class="text-danger"
+                 th:if="${#fields.hasErrors('description')}"
                  th:errors="*{description}">Ошибка
             </div>
           </div>
 
-          <!-- Новый блок: Приоритет -->
+          <!-- ======= Приоритет ======= -->
           <div class="mb-3">
             <label for="priority" class="form-label">Приоритет</label>
             <select id="priority"
                     class="form-select"
                     th:field="*{priority}"
                     required>
-              <option th:value="1" th:text="${project.priority == 1 ? '-- Низкий' : 'Низкий'}">Низкий</option>
-              <option th:value="2" th:text="${project.priority == 2 ? '-- Средний' : 'Средний'}">Средний</option>
-              <option th:value="3" th:text="${project.priority == 3 ? '-- Высокий' : 'Высокий'}">Высокий</option>
+              <option th:value="1">Низкий</option>
+              <option th:value="2">Средний</option>
+              <option th:value="3">Высокий</option>
             </select>
-            <div class="text-danger" th:if="${#fields.hasErrors('priority')}"
+            <div class="text-danger"
+                 th:if="${#fields.hasErrors('priority')}"
                  th:errors="*{priority}">Ошибка
             </div>
           </div>
 
-          <!-- ProjectType (PRIVATE / TEAM) -->
+          <!-- ======= Тип проекта (только если у пользователя есть команда) ======= -->
           <div class="mb-3" th:if="${hasTeam}">
             <label class="form-label">Тип проекта</label>
+
             <div class="form-check">
               <input class="form-check-input"
                      type="radio"
                      name="projectType"
                      id="private"
                      value="PRIVATE"
-                     th:checked="${project.id == null or project.team == null}"/>
+                     th:checked="${project.team == null}">
               <label class="form-check-label" for="private">Личный</label>
             </div>
+
             <div class="form-check">
               <input class="form-check-input"
                      type="radio"
                      name="projectType"
                      id="team"
                      value="TEAM"
-                     th:checked="${project.team != null}"/>
+                     th:checked="${project.team != null}">
               <label class="form-check-label" for="team">Командный</label>
             </div>
+
+            <!-- если валидация projectType/ team «споткнулась» -->
+            <div class="text-danger"
+                 th:if="${#fields.hasErrors('team')}"
+                 th:errors="*{team}">Ошибка</div>
           </div>
 
-          <!-- Ошибка валидации projectType (если есть) -->
-          <div class="text-danger mb-3" th:if="${#fields.hasErrors('team')}">
-            <p th:errors="*{team}">Ошибка</p>
-          </div>
-
-          <!-- Кнопки Сохранить / Отмена -->
+          <!-- ======= Кнопки ======= -->
           <div class="d-flex justify-content-between">
             <button type="submit" class="btn btn-primary">Сохранить</button>
             <a th:href="@{/projects}" class="btn btn-outline-secondary">Отмена</a>
           </div>
+
         </form>
+        <!-- ======= /ФОРМА ======= -->
+
       </div>
     </div>
   </div>
