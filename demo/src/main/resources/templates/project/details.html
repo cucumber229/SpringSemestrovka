@@ -109,7 +109,7 @@
           </tr>
           </thead>
           <tbody>
-          <tr th:each="t : ${project.tasks}">
+          <tr th:each="t : ${tasks}">
             <td th:text="${t.title}">Task title</td>
             <td th:text="${t.status}">TODO</td>
             <td th:text="${t.assignedUser != null ? t.assignedUser.username : '—'}">—</td>
@@ -117,7 +117,8 @@
               <a th:href="@{|/projects/${project.id}/tasks/${t.id}|}"
                  class="btn btn-sm btn-outline-secondary"
                  title="Просмотр">Просмотр</a>
-              <form th:if="${project.owner.username == #authentication.name or #authorization.expression('hasRole(''ADMIN'')')}"
+              <form th:if="${project.owner.username == #authentication.name
+                               or #authorization.expression('hasRole(''ADMIN'')')}"
 
                     th:action="@{|/projects/${project.id}/tasks/${t.id}/delete|}"
                     method="post"
@@ -132,7 +133,7 @@
               </form>
             </td>
           </tr>
-          <tr th:if="${#lists.isEmpty(project.tasks)}">
+          <tr th:if="${#lists.isEmpty(tasks)}">
             <td colspan="4" class="text-center py-3">Задач нет</td>
           </tr>
           </tbody>
