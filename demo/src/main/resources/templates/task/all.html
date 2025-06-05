@@ -22,7 +22,9 @@
                         <th>Название</th>
                         <th>Статус</th>
                         <th>Проект</th>
-                        <th>Исполнители</th>
+
+                        <th>Исполнитель</th>
+
                         <th></th>
                     </tr>
                     </thead>
@@ -33,7 +35,8 @@
                         <td>
                             <a th:href="@{|/projects/${t.project.id}/view|}" th:text="${t.project.name}">Проект</a>
                         </td>
-                        <td th:text="${#strings.listJoin(t.participants.?[username], ', ')}">-</td>
+                        <td th:text="${t.assignedUser != null ? t.assignedUser.username : '—'}">—</td>
+
                         <td class="text-end">
                             <a th:href="@{|/projects/${t.project.id}/tasks/${t.id}|}" class="btn btn-sm btn-outline-secondary">
                                 <i class="bi bi-eye"></i>
