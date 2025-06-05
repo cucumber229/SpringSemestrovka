@@ -68,6 +68,18 @@
             </select>
           </div>
 
+          <!-- Участники задачи -->
+          <div class="mb-3" th:if="${#lists.size(candidates) > 1}">
+            <label for="participantIds" class="form-label">Участники</label>
+            <select id="participantIds" name="participantIds" multiple class="form-select">
+              <option th:each="u : ${candidates}"
+                      th:value="${u.id}"
+                      th:text="${u.username}"
+                      th:selected="${task.participants.contains(u)}">
+              </option>
+            </select>
+          </div>
+
           <!-- Кнопки -->
           <div class="d-flex justify-content-between">
             <button type="submit" class="btn btn-primary">Сохранить</button>

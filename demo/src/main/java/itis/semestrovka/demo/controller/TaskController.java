@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 
 @Controller
 @RequestMapping("/projects/{projectId}/tasks")
@@ -55,6 +57,7 @@ public class TaskController {
                        @Valid @ModelAttribute("task") Task task,
                        BindingResult br,
                        @RequestParam(value = "assigneeId", required = false) Long assigneeId,
+                       @RequestParam(value = "participantIds", required = false) List<Long> participantIds,
                        Model model,
                        @AuthenticationPrincipal User currentUser) {
 
@@ -64,6 +67,15 @@ public class TaskController {
             List<User> candidates = (project.getTeam() != null)
                     ? project.getTeam().getMembers()
                     : List.of(project.getOwner());
+
+            // восстановить выбранных участников при ошибке валидации
+            Set<User> selected = new HashSet<>();
+            if (participantIds != null) {
+                for (Long uid : participantIds) {
+                    selected.add(userService.findById(uid));
+                }
+            }
+            task.setParticipants(selected);
 
             model.addAttribute("projectId", projectId);
             model.addAttribute("candidates", candidates);
@@ -79,6 +91,15 @@ public class TaskController {
         } else {
             task.setAssignedUser(null);
         }
+
+        // Назначение участников задачи (M2M)
+        Set<User> participants = new HashSet<>();
+        if (participantIds != null) {
+            for (Long uid : participantIds) {
+                participants.add(userService.findById(uid));
+            }
+        }
+        task.setParticipants(participants);
 
         taskService.save(task);
         return "redirect:/projects/" + projectId + "/view";
