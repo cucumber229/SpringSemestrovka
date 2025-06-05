@@ -1,120 +1,5 @@
 <!-- templates/fragments/header.html -->
 <th:block th:fragment="header">
-  <style>
-  /* ==========================================
-     СТИЛИ ДЛЯ ШАПКИ (HEADER)
-     ========================================== */
-  .navbar {
-    background: #0d6efd;
-    color: #fff;
-    padding: 0.5rem 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-family: 'Montserrat', sans-serif;
-    min-height: 60px; /* фиксируем высоту шапки */
-  }
-  .navbar .container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-  }
-  .navbar-brand {
-    color: #fff;
-    font-size: 1.5rem;
-    font-weight: 600;
-    text-decoration: none;
-  }
-  .navbar-nav {
-    list-style: none;
-    display: flex;
-    gap: 1rem;
-    margin: 0;
-    padding: 0;
-  }
-  .nav-link {
-    color: #fff;
-    text-decoration: none;
-    font-size: 1.05rem;
-    padding: 0.25rem 0.5rem;
-    border-radius: 0.25rem;
-    transition: background 0.15s, color 0.15s;
-  }
-  .nav-link:hover,
-  .nav-link.active {
-    background: rgba(255, 255, 255, 0.2);
-    color: #fff;
-  }
-  .auth-nav {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-  .auth-nav .navbar-text {
-    color: #fff;
-    font-weight: 500;
-  }
-  .navbar-toggler {
-    display: none;
-    background: none;
-    border: none;
-    color: #fff;
-    font-size: 1.25rem;
-  }
-  .navbar-toggler-icon {
-    display: block;
-    width: 1.5em;
-    height: 1.5em;
-    position: relative;
-  }
-  .navbar-toggler-icon::before,
-  .navbar-toggler-icon::after,
-  .navbar-toggler-icon div {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: currentColor;
-  }
-  .navbar-toggler-icon::before {
-    top: 4px;
-  }
-  .navbar-toggler-icon::after {
-    bottom: 4px;
-  }
-  .navbar-toggler-icon div {
-    top: 50%;
-    margin-top: -1px;
-  }
-  .navbar-collapse {
-    display: none;
-    flex-direction: column;
-    width: 100%;
-    background: #0d6efd;
-    padding: 1rem;
-    gap: 1rem;
-  }
-  .navbar-collapse.show {
-    display: flex;
-  }
-  .navbar-collapse .nav-link {
-    padding: 0.5rem 0.75rem;
-    font-size: 1.2rem;
-  }
-  @media (max-width: 768px) {
-    .navbar-nav {
-      display: none;
-    }
-    .auth-nav {
-      display: none;
-    }
-    .navbar-toggler {
-      display: block;
-    }
-  }
-  </style>
 
   <nav
      xmlns:th="http://www.thymeleaf.org"
@@ -237,7 +122,7 @@
         <form th:action="@{/logout}" method="post">
           <input type="hidden" th:name="${_csrf.parameterName}"
                  th:value="${_csrf.token}"/>
-          <button type="submit" class="btn btn-link nav-link" style="padding: 0;">
+          <button type="submit" class="btn btn-link nav-link">
             Выйти
           </button>
         </form>
