@@ -27,6 +27,13 @@
         </li>
         <li class="nav-item">
           <a class="nav-link"
+             th:href="@{/tasks}"
+             th:classappend="${activePage} == 'tasks' ? ' active'">
+            Задачи
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link"
              th:href="@{/teams}"
              th:classappend="${activePage} == 'teams' ? ' active'">
             Команды

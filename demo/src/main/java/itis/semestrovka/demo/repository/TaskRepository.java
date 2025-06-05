@@ -10,6 +10,8 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 
     List<Task> findAllByProjectId(Long projectId);
 
+    List<Task> findAllByParticipants_Id(Long userId);
+
     // для безопасного удаления через REST
     void deleteByIdAndProjectId(Long id, Long projectId);
 }

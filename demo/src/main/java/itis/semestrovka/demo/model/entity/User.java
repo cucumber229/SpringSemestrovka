@@ -8,6 +8,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -34,6 +36,10 @@ public class User implements UserDetails {
     @ManyToOne
     @JoinColumn(name = "team_id")
     private Team team;
+
+    // Задачи, в которых участвует пользователь
+    @ManyToMany(mappedBy = "participants")
+    private Set<Task> tasks = new HashSet<>();
 
     // --- UserDetails implementation ---
     @Override public Collection<Role> getAuthorities() { return Collections.singleton(role); }
