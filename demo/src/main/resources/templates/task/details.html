@@ -4,27 +4,209 @@
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout}">
-
 <head>
   <meta charset="UTF-8"/>
   <title layout:fragment="title"
          th:text="'Задача «' + ${task.title} + '»'">
     Задача
   </title>
-</head>
+  <style>
+    /* ===================================
+       УТИЛИТАРНЫЕ КЛАССЫ И GRID
+       =================================== */
+    * {
+      box-sizing: border-box;
+    }
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+    .mt-4 {
+      margin-top: 1rem;
+    }
+    .mb-4 {
+      margin-bottom: 1rem;
+    }
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      margin-left: -0.5rem;
+      margin-right: -0.5rem;
+    }
+    .justify-content-center {
+      justify-content: center;
+    }
+    .col-md-8 {
+      flex: 0 0 100%;
+      max-width: 100%;
+      padding: 0 0.5rem;
+    }
+    @media (min-width: 768px) {
+      .col-md-8 {
+        flex: 0 0 66.6667%;
+        max-width: 66.6667%;
+      }
+    }
+    .text-center {
+      text-align: center;
+    }
+    .mb-0 {
+      margin-bottom: 0;
+    }
+    .mb-3 {
+      margin-bottom: 0.75rem;
+    }
+    .d-flex {
+      display: flex;
+    }
+    .justify-content-between {
+      justify-content: space-between;
+    }
+    .me-2 {
+      margin-right: 0.5rem;
+    }
+    .text-end {
+      text-align: right;
+    }
+    .py-3 {
+      padding-top: 1rem;
+      padding-bottom: 1rem;
+    }
 
+    /* ===================================
+       СТИЛИ ДЛЯ КАРТОЧЕК (CARD)
+       =================================== */
+    .card {
+      border: none;
+      border-radius: 0.75rem;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+      background: #fff;
+      margin-bottom: 1rem;
+    }
+    .card-header {
+      background: #0d6efd;
+      color: #fff;
+      padding: 1rem;
+    }
+    .card-header h4 {
+      margin: 0;
+      font-weight: 600;
+      font-size: 1.25rem;
+    }
+    .card-body {
+      padding: 1.5rem;
+    }
+    .card-footer {
+      background: #f8f9fa;
+      padding: 1rem;
+    }
+    .btn {
+      display: inline-block;
+      font-size: 1rem;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-outline-secondary {
+      background: transparent;
+      color: #6c757d;
+      border: 1px solid #6c757d;
+    }
+    .btn-outline-secondary:hover {
+      background: #6c757d;
+      color: #fff;
+    }
+    .btn-primary {
+      background: #0d6efd;
+      color: #fff;
+      border: none;
+    }
+    .btn-primary:hover {
+      background: #0b5ed7;
+    }
+    .btn-danger {
+      background: #dc3545;
+      color: #fff;
+      border: none;
+    }
+    .btn-danger:hover {
+      background: #bb2d3b;
+    }
+
+    /* ===================================
+       СТИЛИ ДЛЯ ОПИСАНИЯ (DESCRIPTION LIST)
+       =================================== */
+    dl.row {
+      margin: 0;
+    }
+    dt.col-sm-4 {
+      flex: 0 0 100%;
+      max-width: 100%;
+      font-weight: 500;
+      color: #212529;
+      padding: 0.25rem 0;
+    }
+    dd.col-sm-8 {
+      flex: 0 0 100%;
+      max-width: 100%;
+      margin-left: 0;
+      padding: 0.25rem 0 0.75rem;
+      color: #495057;
+    }
+    @media (min-width: 576px) {
+      dt.col-sm-4 {
+        flex: 0 0 33.3333%;
+        max-width: 33.3333%;
+      }
+      dd.col-sm-8 {
+        flex: 0 0 66.6667%;
+        max-width: 66.6667%;
+      }
+    }
+
+    /* ===================================
+       СТИЛИ ДЛЯ СПИСКА (COMMENTS)
+       =================================== */
+    .list-group {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      border: 1px solid #dee2e6;
+      border-radius: 0.25rem;
+      overflow: hidden;
+    }
+    .list-group-item {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #dee2e6;
+    }
+    .list-group-item:last-child {
+      border-bottom: none;
+    }
+    .text-muted {
+      color: #6c757d;
+      font-size: 0.875rem;
+    }
+    .ms-2 {
+      margin-left: 0.5rem;
+    }
+  </style>
+</head>
 <body>
 <div layout:fragment="content">
   <div class="container mt-4">
-    <div class="row justify-content-center">
+    <div class="row justify-content-center mb-4">
       <div class="col-md-8">
         <h2 class="text-center mb-4">Детальная страница задачи</h2>
       </div>
     </div>
 
     <!-- ===== Карточка задачи ===== -->
-    <div class="card shadow-sm mb-4">
-      <div class="card-header bg-primary text-white">
+    <div class="card">
+      <div class="card-header">
         <h4 class="mb-0" th:text="'Задача «' + ${task.title} + '»'">Задача</h4>
       </div>
 
@@ -37,7 +219,8 @@
           <dd class="col-sm-8" th:text="${task.description}">—</dd>
 
           <dt class="col-sm-4">Исполнитель</dt>
-          <dd class="col-sm-8" th:text="${task.assignedUser != null ? task.assignedUser.username : '—'}">—</dd>
+          <dd class="col-sm-8"
+              th:text="${task.assignedUser != null ? task.assignedUser.username : '—'}">—</dd>
 
           <dt class="col-sm-4">Проект</dt>
           <dd class="col-sm-8">
@@ -50,7 +233,7 @@
       <div class="card-footer d-flex justify-content-between">
         <a th:href="@{|/projects/${project.id}/view|}"
            class="btn btn-outline-secondary">
-          ← К&nbsp;проекту
+          ← К проекту
         </a>
 
         <div th:if="${project.owner.username == #authentication.name
@@ -74,16 +257,16 @@
     <!-- ===== /Карточка задачи ===== -->
 
     <!-- ===== Комментарии ===== -->
-    <div class="card shadow-sm mb-4">
+    <div class="card">
       <div class="card-header">
         <h5 class="mb-0">Комментарии</h5>
       </div>
-      <ul class="list-group list-group-flush">
+      <ul class="list-group">
         <li class="list-group-item" th:each="comment : ${comments}">
           <strong th:text="${comment.user.username}">user</strong>:
           <span th:text="${comment.content}">content</span>
           <small class="text-muted ms-2"
-                th:text="${#temporals.format(comment.createdAt, 'dd.MM.yyyy HH:mm')}">date</small>
+                 th:text="${#temporals.format(comment.createdAt, 'dd.MM.yyyy HH:mm')}">date</small>
         </li>
         <li class="list-group-item" th:if="${#lists.isEmpty(comments)}">
           Комментариев пока нет

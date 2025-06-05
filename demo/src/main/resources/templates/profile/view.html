@@ -1,24 +1,134 @@
-<!-- src/main/resources/templates/profile/view.html -->
 <!DOCTYPE html>
 <html lang="ru"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout}">
 <head>
+  <meta charset="UTF-8"/>
   <title layout:fragment="title">Профиль</title>
+  <!-- Встроенные стили -->
+  <style>
+    /* ==========================================
+       УТИЛИТАРНЫЕ КЛАССЫ И GRID
+       ========================================== */
+    * {
+      box-sizing: border-box;
+    }
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      margin-left: -0.5rem;
+      margin-right: -0.5rem;
+    }
+    .justify-content-center {
+      justify-content: center;
+    }
+    .mt-5 {
+      margin-top: 5rem;
+    }
+    .col-md-6 {
+      flex: 0 0 100%;
+      max-width: 100%;
+      padding: 0 0.5rem;
+    }
+    @media (min-width: 768px) {
+      .col-md-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+      }
+    }
+
+    /* ==========================================
+       СТИЛИ ДЛЯ КАРТОЧКИ ПРОФИЛЯ
+       ========================================== */
+    .card {
+      border: none;
+      border-radius: 0.75rem;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      background: #fff;
+    }
+    .card.mt-5 {
+      margin-top: 5rem;
+    }
+    .card-header {
+      background: #0d6efd;
+      color: #fff;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .card-header h3 {
+      margin: 0;
+      font-weight: 600;
+      font-size: 1.5rem;
+    }
+    .card-header .btn-outline-light {
+      background: transparent;
+      color: #fff;
+      border: 1px solid #fff;
+      border-radius: 0.25rem;
+      padding: 0.25rem 0.75rem;
+      font-size: 0.875rem;
+      transition: background 0.15s, color 0.15s;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .card-header .btn-outline-light:hover {
+      background: #fff;
+      color: #0d6efd;
+    }
+    .card-body {
+      padding: 1.5rem;
+    }
+    dl.row {
+      margin: 0;
+    }
+    dt.col-sm-4 {
+      flex: 0 0 100%;
+      max-width: 100%;
+      font-weight: 500;
+      color: #212529;
+      padding: 0.25rem 0;
+    }
+    dd.col-sm-8 {
+      flex: 0 0 100%;
+      max-width: 100%;
+      margin-left: 0;
+      padding: 0.25rem 0 0.75rem;
+      color: #495057;
+    }
+    @media (min-width: 576px) {
+      dt.col-sm-4 {
+        flex: 0 0 33.3333%;
+        max-width: 33.3333%;
+      }
+      dd.col-sm-8 {
+        flex: 0 0 66.6667%;
+        max-width: 66.6667%;
+      }
+    }
+  </style>
 </head>
 <body>
 <div layout:fragment="content">
   <div class="container">
     <div class="row justify-content-center">
       <div class="col-md-6">
-        <div class="card mt-5 shadow-sm">
-          <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <div class="card mt-5">
+          <div class="card-header">
             <h3 class="mb-0">Профиль</h3>
-            <a th:href="@{/profile/edit}" class="btn btn-outline-light btn-sm">Редактировать</a>
+            <a th:href="@{/profile/edit}" class="btn-outline-light btn-sm">Редактировать</a>
           </div>
           <div class="card-body">
-            <dl class="row mb-0">
+            <dl class="row">
               <dt class="col-sm-4">Имя</dt>
               <dd class="col-sm-8" th:text="${profile.fullName}">—</dd>
               <dt class="col-sm-4">О себе</dt>

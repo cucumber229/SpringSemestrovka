@@ -5,24 +5,201 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout}">
 <head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title layout:fragment="title" th:text="${title}">Управление командами</title>
+  <style>
+    /* ===================================
+       СБРОС ОТСТУПОВ И УТИЛИТАРНЫЕ КЛАССЫ
+       =================================== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: #f0f4f8;
+    }
+    .container {
+      width: 100%;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 1rem;
+      padding-bottom: 2rem;
+    }
+    .mt-5 { margin-top: 3rem; }
+    .mb-0 { margin-bottom: 0; }
+    .mb-3 { margin-bottom: 0.75rem; }
+    .d-flex { display: flex; }
+    .justify-content-between { justify-content: space-between; }
+    .align-items-center { align-items: center; }
+    .text-center { text-align: center; }
+    .me-2 { margin-right: 0.5rem; }
+    .gap-2 { gap: 0.5rem; }
+
+    /* ===================================
+       GRID-КЛАССЫ
+       =================================== */
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      margin-left: -0.5rem;
+      margin-right: -0.5rem;
+    }
+    [class*="col-"] {
+      padding-left: 0.5rem;
+      padding-right: 0.5rem;
+      flex: 0 0 100%;
+      max-width: 100%;
+    }
+    @media (min-width: 768px) {
+      .col-md-10 {
+        flex: 0 0 83.3333%;
+        max-width: 83.3333%;
+      }
+    }
+
+    /* ===================================
+       СТИЛИ ДЛЯ КАРТОЧКИ (CARD)
+       =================================== */
+    .card {
+      background: #fff;
+      border: none;
+      border-radius: 0;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+      margin-bottom: 1rem;
+      overflow: visible;
+    }
+    .card-header {
+      background: #0d6efd;
+      color: #fff;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-radius: 0;
+    }
+    .card-header h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    /* Кнопки в шапке */
+    .btn-success {
+      background: #198754;
+      color: #fff;
+      border: 1px solid #198754;
+      border-radius: 0.25rem;
+      padding: 0.5rem 1rem;
+      font-size: 0.95rem;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-success:hover {
+      background: #157347;
+    }
+    .btn-outline-light {
+      background: transparent;
+      color: #fff;
+      border: 1px solid #fff;
+      border-radius: 0.25rem;
+      padding: 0.35rem 0.75rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-outline-light:hover {
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+    }
+
+    .card-body {
+      padding: 0; /* обнуляем padding чтобы таблица заняла всю ширину */
+      overflow: visible;
+    }
+
+    /* ===================================
+       СТИЛИ ДЛЯ ТАБЛИЦЫ
+       =================================== */
+    .table-responsive {
+      overflow-x: auto;
+    }
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 0;
+    }
+    .table-hover tbody tr:hover {
+      background: rgba(13, 110, 253, 0.05);
+    }
+    .table th,
+    .table td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #dee2e6;
+      vertical-align: middle;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .table thead th {
+      background: #f8f9fa;
+      color: #212529;
+      font-weight: 600;
+      border-bottom: 2px solid #ced4da;
+    }
+
+    /* Кнопки внутри таблицы */
+    .btn-sm {
+      font-size: 0.85rem;
+      padding: 0.3rem 0.6rem;
+      border-radius: 0.25rem;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      border: 1px solid transparent;
+    }
+    .btn-outline-primary {
+      background: transparent;
+      color: #0d6efd;
+      border-color: #0d6efd;
+    }
+    .btn-outline-primary:hover {
+      background: #0d6efd;
+      color: #fff;
+    }
+    .btn-outline-danger {
+      background: transparent;
+      color: #dc3545;
+      border-color: #dc3545;
+    }
+    .btn-outline-danger:hover {
+      background: #dc3545;
+      color: #fff;
+    }
+  </style>
 </head>
+
 <body>
 <div layout:fragment="content">
   <div class="container">
-    <div class="row justify-content-center">
+    <div class="row justify-content-center mt-5">
       <div class="col-md-10">
-        <div class="card mt-5 shadow-sm">
-          <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <div class="card">
+          <!-- Шапка карточки -->
+          <div class="card-header">
             <h3 class="mb-0" th:text="${title}">Управление командами</h3>
-            <div>
-              <a th:href="@{/teams/new}" class="btn btn-success me-2">Создать команду</a>
-              <a th:href="@{/teams}" class="btn btn-outline-light btn-sm">
-                Назад к списку
-              </a>
+            <div class="d-flex gap-2">
+              <a th:href="@{/teams/new}" class="btn-success btn-sm">Создать команду</a>
+              <a th:href="@{/teams}" class="btn-outline-light btn-sm">Назад к списку</a>
             </div>
           </div>
-          <div class="card-body p-0">
+
+          <!-- Тело карточки -->
+          <div class="card-body">
             <div class="table-responsive">
               <table class="table table-hover mb-0">
                 <thead class="table-light">
@@ -30,7 +207,7 @@
                   <th scope="col">ID</th>
                   <th scope="col">Название</th>
                   <th scope="col">Участников</th>
-                  <th scope="col">Действия</th>
+                  <th scope="col" class="text-end">Действия</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -38,15 +215,15 @@
                   <td th:text="${t.id}">1</td>
                   <td th:text="${t.name}">Название</td>
                   <td th:text="${t.members.size()}">0</td>
-                  <td>
-                    <div class="d-flex">
-                      <a th:href="@{|/teams/${t.id}/edit|}"
-                         class="btn btn-sm btn-outline-primary me-2">Редактировать</a>
-                      <form th:action="@{|/teams/${t.id}/delete|}"
-                            method="post">
-                        <button type="submit" class="btn btn-sm btn-outline-danger">Удалить</button>
-                      </form>
-                    </div>
+                  <td class="text-end d-flex justify-content-end gap-2">
+                    <a th:href="@{|/teams/${t.id}/edit|}"
+                       class="btn-sm btn-outline-primary"
+                       title="Редактировать">Редактировать</a>
+                    <form th:action="@{|/teams/${t.id}/delete|}"
+                          method="post">
+                      <button type="submit" class="btn-sm btn-outline-danger"
+                              title="Удалить">Удалить</button>
+                    </form>
                   </td>
                 </tr>
                 <tr th:if="${#lists.isEmpty(teams)}">
@@ -56,6 +233,7 @@
               </table>
             </div>
           </div>
+
         </div>
       </div>
     </div>

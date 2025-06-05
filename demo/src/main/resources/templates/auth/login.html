@@ -4,37 +4,175 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout}">
 <head>
-  <!-- будет подставлено вместо <title> в layout.html -->
+  <meta charset="UTF-8"/>
   <title layout:fragment="title">Вход</title>
+  <!-- Встроенные стили -->
+  <style>
+    /* ==========================================
+       УТИЛИТАРНЫЕ КЛАССЫ И GRID
+       ========================================== */
+    * {
+      box-sizing: border-box;
+    }
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      margin-left: -0.5rem;
+      margin-right: -0.5rem;
+    }
+    .justify-content-center {
+      justify-content: center;
+    }
+    .mt-4 {
+      margin-top: 4rem;
+    }
+    .mb-4 {
+      margin-bottom: 4rem;
+    }
+    .col-12 {
+      flex: 0 0 100%;
+      max-width: 100%;
+      padding: 0 0.5rem;
+    }
+    @media (min-width: 576px) {
+      .col-sm-8 {
+        flex: 0 0 66.6667%;
+        max-width: 66.6667%;
+      }
+    }
+    @media (min-width: 768px) {
+      .col-md-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+      }
+    }
+    @media (min-width: 992px) {
+      .col-lg-4 {
+        flex: 0 0 33.3333%;
+        max-width: 33.3333%;
+      }
+    }
+
+    /* ==========================================
+       СТИЛИ ДЛЯ КАРТОЧКИ ФОРМЫ
+       ========================================== */
+    .tm-card {
+      border: none;
+      border-radius: 0.75rem;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      background: #fff;
+    }
+    .tm-card .card-header {
+      background: #0d6efd;
+      color: #fff;
+      text-align: center;
+      padding: 1rem;
+    }
+    .tm-card .card-body {
+      padding: 1.5rem;
+    }
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    .form-group label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 0.25rem;
+      color: #212529;
+    }
+    .form-group input[type="text"],
+    .form-group input[type="password"] {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid #ced4da;
+      border-radius: 0.25rem;
+      font-size: 1rem;
+      color: #495057;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .form-group input:focus {
+      border-color: #0d6efd;
+      outline: none;
+      box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+    .btn-main {
+      background: #0083b0;
+      color: #fff;
+      border: none;
+      border-radius: 0.5rem;
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      width: 100%;
+      font-size: 1.05rem;
+      transition: background 0.15s;
+      cursor: pointer;
+    }
+    .btn-main:hover {
+      background: #006994;
+    }
+    .register-link {
+      text-align: center;
+      margin-top: 1rem;
+      font-size: 0.95rem;
+    }
+    .register-link a {
+      color: #0d6efd;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .register-link a:hover {
+      text-decoration: underline;
+    }
+
+    /* ==========================================
+       СТИЛИ ДЛЯ УВЕДОМЛЕНИЙ
+       ========================================== */
+    .text-center {
+      text-align: center;
+    }
+    .text-success {
+      color: #006994;
+      font-weight: 500;
+    }
+    .text-danger {
+      color: #dc3545;
+      font-weight: 500;
+    }
+  </style>
 </head>
 <body>
-<!-- попадёт в <main layout:fragment="content"> -->
 <div layout:fragment="content">
-  <div>
-    <div>
-      <div>
-        <div>
-          <div>
-            <h3>Вход</h3>
+  <div class="container">
+    <div class="row justify-content-center mt-4 mb-4">
+      <div class="col-12 col-sm-8 col-md-6 col-lg-4">
+        <div class="tm-card">
+          <!-- Заголовок карточки -->
+          <div class="card-header">
+            <h3 class="mb-0">Вход</h3>
           </div>
-          <div>
-            <!-- сообщение об успешной регистрации -->
-            <div th:if="${registered}">
+          <div class="card-body">
+            <!-- Уведомления -->
+            <div th:if="${registered}" class="mb-3 text-center text-success">
               Регистрация прошла успешно! Пожалуйста, войдите.
             </div>
-
-            <!-- сообщение об ошибке при входе -->
-            <div th:if="${loginError}">
+            <div th:if="${loginError}" class="mb-3 text-center text-danger">
               Неверное имя пользователя или пароль
             </div>
 
             <form th:action="@{/login}" method="post">
-              <!-- CSRF токен -->
               <input type="hidden"
                      th:name="${_csrf.parameterName}"
-                     th:value="${_csrf.token}"/>
+                     th:value="${_csrf.token}" />
 
-              <div>
+              <!-- Поле «Имя пользователя» -->
+              <div class="form-group">
                 <label for="username">Имя пользователя</label>
                 <input type="text"
                        id="username"
@@ -43,7 +181,8 @@
                        required>
               </div>
 
-              <div>
+              <!-- Поле «Пароль» -->
+              <div class="form-group">
                 <label for="password">Пароль</label>
                 <input type="password"
                        id="password"
@@ -52,14 +191,14 @@
                        required>
               </div>
 
-              <button type="submit">Войти</button>
+              <!-- Кнопка «Войти» -->
+              <button type="submit" class="btn-main">Войти</button>
             </form>
 
-            <div>
-              <p>
-                Нет аккаунта?
-                <a th:href="@{/register}">Зарегистрироваться</a>
-              </p>
+            <!-- Ссылка на регистрацию -->
+            <div class="register-link">
+              Нет аккаунта?
+              <a th:href="@{/register}">Зарегистрироваться</a>
             </div>
           </div>
         </div>
@@ -67,7 +206,5 @@
     </div>
   </div>
 </div>
-
-
 </body>
 </html>

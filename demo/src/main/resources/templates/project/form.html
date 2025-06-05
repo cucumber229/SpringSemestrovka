@@ -7,30 +7,128 @@
 <head>
   <meta charset="UTF-8"/>
   <title layout:fragment="title" th:text="${title}">Форма проекта</title>
+  <!-- Встроенные стили -->
+  <style>
+    /* ===================================
+       УТИЛИТАРНЫЕ КЛАССЫ И GRID
+       =================================== */
+    * {
+      box-sizing: border-box;
+    }
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+    .mt-4 {
+      margin-top: 1rem;
+    }
+    .card {
+      border: none;
+      border-radius: 0.75rem;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+      background: #fff;
+      overflow: hidden;
+      margin-bottom: 1rem;
+    }
+    .card-header {
+      background: #0d6efd;
+      color: #fff;
+      padding: 1rem;
+    }
+    .card-header h3 {
+      margin: 0;
+      font-weight: 600;
+      font-size: 1.5rem;
+    }
+    .card-body {
+      padding: 1.5rem;
+    }
+    .mb-3 {
+      margin-bottom: 1rem;
+    }
+    .form-label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 0.25rem;
+      color: #212529;
+    }
+    .form-control,
+    .form-select {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid #ced4da;
+      border-radius: 0.25rem;
+      font-size: 1rem;
+      color: #495057;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .form-control:focus,
+    .form-select:focus {
+      border-color: #0d6efd;
+      outline: none;
+      box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+    .text-danger {
+      color: #dc3545;
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+    }
+    .d-flex {
+      display: flex;
+    }
+    .justify-content-between {
+      justify-content: space-between;
+    }
+    .btn {
+      display: inline-block;
+      font-size: 1rem;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-primary {
+      background: #0d6efd;
+      color: #fff;
+      border: none;
+    }
+    .btn-primary:hover {
+      background: #0b5ed7;
+    }
+    .btn-outline-secondary {
+      background: transparent;
+      color: #6c757d;
+      border: 1px solid #6c757d;
+    }
+    .btn-outline-secondary:hover {
+      background: #6c757d;
+      color: #fff;
+    }
+    .me-2 {
+      margin-right: 0.5rem;
+    }
+  </style>
 </head>
-
 <body>
 <div layout:fragment="content">
   <div class="container mt-4">
-    <div class="card shadow-sm">
-
-      <div class="card-header bg-primary text-white">
+    <div class="card">
+      <div class="card-header">
         <h3 class="mb-0" th:text="${title}">Форма проекта</h3>
       </div>
-
       <div class="card-body">
-
-        <!-- ======= ФОРМА ======= -->
+        <!-- Форма проекта -->
         <form th:action="@{/projects}"
               th:object="${project}"
               method="post">
-
-          <!-- id (только при редактировании) -->
           <input type="hidden"
                  th:if="${project.id != null}"
                  th:field="*{id}"/>
 
-          <!-- ======= Название ======= -->
+          <!-- Название -->
           <div class="mb-3">
             <label for="name" class="form-label">Название</label>
             <input type="text"
@@ -45,7 +143,7 @@
             </div>
           </div>
 
-          <!-- ======= Описание ======= -->
+          <!-- Описание -->
           <div class="mb-3">
             <label for="description" class="form-label">Описание</label>
             <textarea id="description"
@@ -59,7 +157,7 @@
             </div>
           </div>
 
-          <!-- ======= Приоритет ======= -->
+          <!-- Приоритет -->
           <div class="mb-3">
             <label for="priority" class="form-label">Приоритет</label>
             <select id="priority"
@@ -76,10 +174,9 @@
             </div>
           </div>
 
-          <!-- ======= Тип проекта (только если у пользователя есть команда) ======= -->
+          <!-- Тип проекта -->
           <div class="mb-3" th:if="${hasTeam}">
             <label class="form-label">Тип проекта</label>
-
             <div class="form-check">
               <input class="form-check-input"
                      type="radio"
@@ -89,7 +186,6 @@
                      th:checked="${project.team == null}">
               <label class="form-check-label" for="private">Личный</label>
             </div>
-
             <div class="form-check">
               <input class="form-check-input"
                      type="radio"
@@ -99,22 +195,18 @@
                      th:checked="${project.team != null}">
               <label class="form-check-label" for="team">Командный</label>
             </div>
-
-            <!-- если валидация projectType/ team «споткнулась» -->
             <div class="text-danger"
                  th:if="${#fields.hasErrors('team')}"
                  th:errors="*{team}">Ошибка</div>
           </div>
 
-          <!-- ======= Кнопки ======= -->
+          <!-- Кнопки -->
           <div class="d-flex justify-content-between">
             <button type="submit" class="btn btn-primary">Сохранить</button>
             <a th:href="@{/projects}" class="btn btn-outline-secondary">Отмена</a>
           </div>
-
         </form>
-        <!-- ======= /ФОРМА ======= -->
-
+        <!-- /Форма проекта -->
       </div>
     </div>
   </div>

@@ -10,25 +10,182 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
 
-  <!-- Custom styles instead of Bootstrap -->
+  <!-- Встроенные стили -->
+  <style>
+    /* ==========================================
+       БАЗОВЫЕ СТИЛИ И ФЛЕКС-ЛОЯУТ ДЛЯ BODY И LAYOUT
+       ========================================== */
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      background: linear-gradient(120deg, #f0f4f8 0%, #e1e8ee 100%);
+      font-family: 'Montserrat', sans-serif;
+    }
+    main {
+      flex: 1; /* занимает всё доступное пространство между шапкой и футером */
+    }
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+    .py-4 {
+      padding-top: 1.5rem;
+      padding-bottom: 1.5rem;
+    }
+    .mt-auto {
+      margin-top: auto;
+    }
 
-  <link rel="stylesheet" th:href="@{/css/style.css}"/>
+    /* ==========================================
+       СТИЛИ ДЛЯ ШАПКИ (HEADER)
+       ========================================== */
+    .navbar {
+      background: #0d6efd;
+      color: #fff;
+      padding: 0.5rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .navbar .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+    }
+    .navbar-brand {
+      color: #fff;
+      font-size: 1.5rem;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .navbar-nav {
+      list-style: none;
+      display: flex;
+      gap: 1rem;
+      margin: 0;
+      padding: 0;
+    }
+    .nav-link {
+      color: #fff;
+      text-decoration: none;
+      font-size: 1.05rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      transition: background 0.15s, color 0.15s;
+    }
+    .nav-link:hover,
+    .nav-link.active {
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+    }
+    .auth-nav {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .auth-nav .navbar-text {
+      color: #fff;
+      font-weight: 500;
+    }
+    .navbar-toggler {
+      display: none;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 1.25rem;
+    }
+    .navbar-toggler-icon {
+      display: block;
+      width: 1.5em;
+      height: 1.5em;
+      position: relative;
+    }
+    .navbar-toggler-icon::before,
+    .navbar-toggler-icon::after,
+    .navbar-toggler-icon div {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: currentColor;
+    }
+    .navbar-toggler-icon::before {
+      top: 4px;
+    }
+    .navbar-toggler-icon::after {
+      bottom: 4px;
+    }
+    .navbar-toggler-icon div {
+      top: 50%;
+      margin-top: -1px;
+    }
+    .navbar-collapse {
+      display: none;
+      flex-direction: column;
+      width: 100%;
+      background: #0d6efd;
+      padding: 1rem;
+      gap: 1rem;
+    }
+    .navbar-collapse.show {
+      display: flex;
+    }
+    .navbar-collapse .nav-link {
+      padding: 0.5rem 0.75rem;
+      font-size: 1.2rem;
+    }
+    @media (max-width: 768px) {
+      .navbar-nav {
+        display: none;
+      }
+      .auth-nav {
+        display: none;
+      }
+      .navbar-toggler {
+        display: block;
+      }
+    }
+
+    /* ==========================================
+       СТИЛИ ДЛЯ ПОДВАЛА (FOOTER)
+       ========================================== */
+    footer {
+      background: #343a40;
+      color: #fff;
+      padding: 1rem 0;
+      font-size: 0.95rem;
+      letter-spacing: 0.05em;
+    }
+    footer .container {
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
+
 <!-- Шапка -->
 <header>
   <div th:replace="fragments/header :: header"></div>
 </header>
 
-<!-- Основной контент (займёт всё доступное пространство) -->
-<main layout:fragment="content"></main>
+<!-- Основной контент -->
+<main layout:fragment="content" class="container py-4">
+  <!-- Здесь будет контент конкретной страницы -->
+</main>
 
-<!-- Подвал (прижат к низу) -->
-<footer>
-  <div th:replace="fragments/footer :: footer"></div>
-</footer>
+<!-- Подвал -->
+<footer th:replace="fragments/footer :: footer" class="mt-auto"></footer>
 
-  <script th:src="@{/js/app.js}"></script>
-
+<script th:src="@{/js/app.js}"></script>
 </body>
 </html>

@@ -5,22 +5,196 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout}">
 <head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title layout:fragment="title" th:text="${title}">Список команд</title>
+    <style>
+        /* ===================================
+           СБРОС ОТСТУПОВ И УТИЛИТАРНЫЕ КЛАССЫ
+           =================================== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #f0f4f8;
+        }
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 1rem;
+            padding-bottom: 2rem;
+        }
+        .py-4 {
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+        .mt-5 { margin-top: 3rem; }
+        .mb-0 { margin-bottom: 0; }
+        .mb-1 { margin-bottom: 0.25rem; }
+        .d-flex { display: flex; }
+        .flex-wrap { flex-wrap: wrap; }
+        .justify-content-between { justify-content: space-between; }
+        .align-items-center { align-items: center; }
+        .text-center { text-align: center; }
+        .text-muted { color: #6c757d; font-size: 0.875rem; }
+        .me-2 { margin-right: 0.5rem; }
+        .mb-3 { margin-bottom: 0.75rem; }
+
+        /* ===================================
+           GRID-КЛАССЫ
+           =================================== */
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin-left: -0.5rem;
+            margin-right: -0.5rem;
+        }
+        [class*="col-"] {
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+        @media (min-width: 768px) {
+            .col-md-10 {
+                flex: 0 0 83.3333%;
+                max-width: 83.3333%;
+            }
+        }
+
+        /* ===================================
+           СТИЛИ ДЛЯ КАРТОЧКИ (CARD)
+           =================================== */
+        .card {
+            background: #fff;
+            border: none;
+            border-radius: 0;      /* без скруглений */
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1rem;
+            overflow: visible;
+        }
+        .card-header {
+            background: #0d6efd;
+            color: #fff;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 0;
+        }
+        .card-header h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        .btn-admin {
+            background: #6c757d;
+            color: #fff;
+            border: 1px solid #6c757d;
+            border-radius: 0.25rem;
+            padding: 0.4rem 0.75rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background 0.15s;
+        }
+        .btn-admin:hover {
+            background: #5c636a;
+        }
+
+        .card-body {
+            padding: 0;
+            overflow: visible;
+        }
+
+        /* ===================================
+           СТИЛИ ДЛЯ ТАБЛИЦЫ
+           =================================== */
+        .table-responsive {
+            overflow-x: auto;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 0;
+        }
+        .table-hover tbody tr:hover {
+            background: rgba(13, 110, 253, 0.05);
+        }
+        .table th,
+        .table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #dee2e6;
+            vertical-align: middle;
+            text-align: left;
+            white-space: nowrap;
+        }
+        .table thead th {
+            background: #f8f9fa;
+            color: #212529;
+            font-weight: 600;
+            border-bottom: 2px solid #ced4da;
+        }
+
+        /* Кнопки внутри таблицы */
+        .btn-sm {
+            font-size: 0.85rem;
+            padding: 0.3rem 0.6rem;
+            border-radius: 0.25rem;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s;
+            border: 1px solid transparent;
+        }
+        .btn-outline-primary {
+            background: transparent;
+            color: #0d6efd;
+            border-color: #0d6efd;
+        }
+        .btn-outline-primary:hover {
+            background: #0d6efd;
+            color: #fff;
+        }
+        .btn-outline-danger {
+            background: transparent;
+            color: #dc3545;
+            border-color: #dc3545;
+        }
+        .btn-outline-danger:hover {
+            background: #dc3545;
+            color: #fff;
+        }
+
+        .card-footer {
+            padding: 1rem;
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            border-radius: 0;
+            text-align: right;
+        }
+    </style>
 </head>
+
 <body>
 <div layout:fragment="content">
     <div class="container py-4">
-        <div class="row justify-content-center">
+        <div class="row justify-content-center mt-5">
             <div class="col-md-10">
-                <div class="card mt-5 shadow-sm">
-                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <div class="card">
+                    <!-- Шапка карточки -->
+                    <div class="card-header">
                         <h3 class="mb-0" th:text="${title}">Список команд</h3>
-                        <!-- Кнопка «Перейти в админку» для ADMIN -->
+                        <!-- Кнопка «Управление командами» для ADMIN -->
                         <a th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}"
                            th:href="@{/teams/admin}"
-                           class="btn btn-secondary btn-sm">Управление командами</a>
+                           class="btn-admin btn-sm">Управление командами</a>
                     </div>
-                    <div class="card-body p-0">
+
+                    <!-- Тело карточки с таблицей -->
+                    <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-hover mb-0">
                                 <thead class="table-light">
@@ -28,7 +202,7 @@
                                     <th scope="col">ID</th>
                                     <th scope="col">Название</th>
                                     <th scope="col">Участников</th>
-                                    <th scope="col">Действия</th>
+                                    <th scope="col" class="text-end">Действия</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -36,19 +210,17 @@
                                     <td th:text="${t.id}">1</td>
                                     <td th:text="${t.name}">Название команды</td>
                                     <td th:text="${t.members.size()} + ' чел.'">0 чел.</td>
-                                    <td class="d-flex flex-wrap">
-                                        <!-- Кнопка «Просмотреть» доступна wsz воcем пользователям -->
+                                    <td class="text-end d-flex flex-wrap justify-content-end mb-1">
+                                        <!-- Кнопка «Просмотреть» -->
                                         <a th:href="@{|/teams/${t.id}/view|}"
-                                           class="btn btn-sm btn-outline-primary me-2 mb-1">Просмотреть</a>
-
-
+                                           class="btn-sm btn-outline-primary me-2 mb-1">Просмотреть</a>
                                         <!-- Форма «Удалить» для ADMIN -->
                                         <form th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}"
                                               th:action="@{|/teams/${t.id}/delete|}"
                                               method="post"
                                               class="mb-1"
                                               style="display:inline">
-                                            <button type="submit" class="btn btn-sm btn-outline-danger">Удалить</button>
+                                            <button type="submit" class="btn-sm btn-outline-danger">Удалить</button>
                                         </form>
                                     </td>
                                 </tr>
@@ -59,6 +231,8 @@
                             </table>
                         </div>
                     </div>
+
+                    <!-- Футер карточки -->
                     <div class="card-footer text-muted">
                         Всего команд: <span th:text="${teams.size()}">0</span>
                     </div>
