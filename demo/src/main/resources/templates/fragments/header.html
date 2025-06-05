@@ -1,5 +1,6 @@
 <!-- templates/fragments/header.html -->
-<style>
+<th:block th:fragment="header">
+  <style>
   /* ==========================================
      СТИЛИ ДЛЯ ШАПКИ (HEADER)
      ========================================== */
@@ -113,9 +114,9 @@
       display: block;
     }
   }
-</style>
+  </style>
 
-<nav th:fragment="header"
+  <nav
      xmlns:th="http://www.thymeleaf.org"
      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
      class="navbar">
@@ -243,4 +244,5 @@
       </li>
     </ul>
   </div>
-</nav>
+  </nav>
+</th:block>
