@@ -28,7 +28,7 @@
 
       <!-- Кнопки справа -->
       <div class="d-flex gap-2"
-           th:if="${project.owner.username == #authentication.name or #authentication.principal.role == 'ROLE_ADMIN'}">
+           th:if="${project.owner.username == #authentication.name or #authorization.expression('hasRole(''ROLE_ADMIN'')')}">
         <a th:href="@{|/projects/${project.id}/tasks/${task.id}/edit|}"
            class="btn btn-sm btn-outline-light"
            title="Редактировать">
