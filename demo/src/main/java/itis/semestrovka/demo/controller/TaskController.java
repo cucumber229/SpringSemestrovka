@@ -139,4 +139,19 @@ public class TaskController {
         return "task/details";
     }
 
+    /* ----------  ДОБАВЛЕНИЕ КОММЕНТАРИЯ  ---------- */
+    @PostMapping("/{id}/comments")
+    public String addComment(@PathVariable Long projectId,
+                             @PathVariable Long id,
+                             @AuthenticationPrincipal User currentUser,
+                             @RequestParam("content") String content) {
+        Task task = taskService.findById(id);
+        Comment comment = new Comment();
+        comment.setTask(task);
+        comment.setUser(currentUser);
+        comment.setContent(content);
+        commentService.save(comment);
+        return "redirect:/projects/" + projectId + "/tasks/" + id;
+    }
+
 }

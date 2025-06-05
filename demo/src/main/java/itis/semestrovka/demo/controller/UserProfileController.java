@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @Controller
 @RequiredArgsConstructor
@@ -21,6 +22,14 @@ public class UserProfileController {
         UserProfile profile = profileService.findByUserId(currentUser.getId());
         model.addAttribute("profile", profile);
         model.addAttribute("title", "Профиль");
+        return "profile/view";
+    }
+
+    @GetMapping("/users/{userId}/profile")
+    public String viewByUserId(@PathVariable Long userId, Model model) {
+        UserProfile profile = profileService.findByUserId(userId);
+        model.addAttribute("profile", profile);
+        model.addAttribute("title", "Профиль пользователя");
         return "profile/view";
     }
 

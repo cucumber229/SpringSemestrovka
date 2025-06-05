@@ -20,4 +20,9 @@ public class CommentServiceImpl implements CommentService {
     public List<Comment> findAllByTaskId(Long taskId) {
         return repo.findAllByTaskId(taskId);
     }
+
+    @Override
+    public Comment save(Comment comment) {
+        return repo.save(comment);
+    }
 }
