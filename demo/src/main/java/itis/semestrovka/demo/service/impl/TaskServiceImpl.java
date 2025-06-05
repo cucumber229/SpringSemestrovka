@@ -41,6 +41,16 @@ public class TaskServiceImpl implements TaskService {
         return repo.findAllByProjectId(projectId);
     }
 
+    @Override
+    public List<Task> findAll() {
+        return repo.findAll();
+    }
+
+    @Override
+    public List<Task> findAllByUser(Long userId) {
+        return repo.findAllByParticipants_Id(userId);
+    }
+
     /* ===== REST / AJAX (заглушки) ===== */
 
     @Override
