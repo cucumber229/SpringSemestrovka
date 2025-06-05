@@ -109,6 +109,10 @@
       });
       if (resp.ok) {
         btn.closest('tr').remove();
+
+      } else if (resp.status === 403) {
+        alert('Недостаточно прав для удаления');
+
       } else {
         alert('Ошибка удаления пользователя');
       }
