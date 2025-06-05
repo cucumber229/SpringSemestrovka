@@ -23,7 +23,13 @@ public class TeamServiceImpl implements TeamService {
     /* ---------- базовые методы ---------- */
 
     @Override public List<Team> findAllTeams()   { return teamRepo.findAll(); }
-    @Override public Team findById(Long id)      { return teamRepo.findById(id).orElseThrow(); }
+
+    @Override
+    public Team findById(Long id) {
+        // Используем собственный JPQL-запрос для загрузки команды вместе с участниками
+        return teamRepo.findByIdWithMembers(id).orElseThrow();
+    }
+
     @Override public Team create(Team t)         { return teamRepo.save(t); }
     @Override public void deleteById(Long id)    { teamRepo.deleteById(id); }
 
