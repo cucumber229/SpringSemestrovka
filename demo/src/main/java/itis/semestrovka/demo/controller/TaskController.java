@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 
 @Controller
 @RequestMapping("/projects/{projectId}/tasks")
@@ -55,6 +57,7 @@ public class TaskController {
                        @Valid @ModelAttribute("task") Task task,
                        BindingResult br,
                        @RequestParam(value = "assigneeId", required = false) Long assigneeId,
+                       @RequestParam(value = "participantIds", required = false) List<Long> participantIds,
                        Model model,
                        @AuthenticationPrincipal User currentUser) {
 
@@ -64,6 +67,15 @@ public class TaskController {
             List<User> candidates = (project.getTeam() != null)
                     ? project.getTeam().getMembers()
                     : List.of(project.getOwner());
+
+            // восстановить выбранных участников при ошибке валидации
+            Set<User> selected = new HashSet<>();
+            if (participantIds != null) {
+                for (Long uid : participantIds) {
+                    selected.add(userService.findById(uid));
+                }
+            }
+            task.setParticipants(selected);
 
             model.addAttribute("projectId", projectId);
             model.addAttribute("candidates", candidates);
@@ -79,6 +91,25 @@ public class TaskController {
         } else {
             task.setAssignedUser(null);
         }
+
+        // Назначение участников задачи (M2M) только из членов команды
+        Set<User> participants = new HashSet<>();
+        if (participantIds != null) {
+            Set<Long> allowed = new HashSet<>();
+            if (project.getTeam() != null) {
+                for (User u : project.getTeam().getMembers()) {
+                    allowed.add(u.getId());
+                }
+            } else {
+                allowed.add(project.getOwner().getId());
+            }
+            for (Long uid : participantIds) {
+                if (allowed.contains(uid)) {
+                    participants.add(userService.findById(uid));
+                }
+            }
+        }
+        task.setParticipants(participants);
 
         taskService.save(task);
         return "redirect:/projects/" + projectId + "/view";
@@ -112,20 +143,22 @@ public class TaskController {
     @GetMapping("/{id}")
     public String view(@PathVariable Long projectId,
                        @PathVariable Long id,
-                       Model model) {
+                       Model model,
+                       @AuthenticationPrincipal User currentUser) {
 
         Task    task    = taskService.findById(id);
         Project project = projectService.findById(projectId);
         List<Comment> comments = commentService.findAllByTaskId(id);
 
-        // доступ: владелец проекта, любой из команды или ADMIN
-        boolean allowed =
-                task.getProject().getOwner().getId().equals(project.getOwner().getId()) ||
-                        (project.getTeam() != null && project.getTeam().getMembers()
-                                .contains(project.getOwner())) ||
-                        SecurityContextHolder.getContext().getAuthentication()
-                                .getAuthorities().stream()
-                                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        boolean isAdmin = SecurityContextHolder.getContext().getAuthentication()
+                .getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        boolean isOwner = project.getOwner().getId().equals(currentUser.getId());
+        boolean isAssigned = (task.getAssignedUser() != null && task.getAssignedUser().getId().equals(currentUser.getId()))
+                || task.getParticipants().contains(currentUser);
+        boolean isTeamMember = project.getTeam() != null && project.getTeam().getMembers().contains(currentUser);
+
+        boolean allowed = isOwner || isAdmin || (isTeamMember && isAssigned);
 
         if (!allowed) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
@@ -152,6 +185,31 @@ public class TaskController {
         comment.setContent(content);
         commentService.save(comment);
         return "redirect:/projects/" + projectId + "/tasks/" + id;
+    }
+
+    /* ----------  УДАЛЕНИЕ УЧАСТНИКА ЗАДАЧИ  ---------- */
+    @PostMapping("/{taskId}/participants/{userId}/delete")
+    public String removeParticipant(@PathVariable Long projectId,
+                                    @PathVariable Long taskId,
+                                    @PathVariable Long userId,
+                                    @AuthenticationPrincipal User currentUser) {
+
+        Task task = taskService.findById(taskId);
+        Project project = projectService.findById(projectId);
+
+        boolean isAdmin = SecurityContextHolder.getContext().getAuthentication()
+                .getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        boolean isOwner = project.getOwner().getId().equals(currentUser.getId());
+
+        if (!(isOwner || isAdmin)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        task.getParticipants().removeIf(u -> u.getId().equals(userId));
+        taskService.save(task);
+
+        return "redirect:/projects/" + projectId + "/tasks/" + taskId + "/edit";
     }
 
 }

@@ -2,7 +2,9 @@
 package itis.semestrovka.demo.controller;
 
 import itis.semestrovka.demo.model.entity.Project;
+import itis.semestrovka.demo.model.entity.Task;
 import itis.semestrovka.demo.model.entity.User;
+import itis.semestrovka.demo.model.entity.Role;
 import itis.semestrovka.demo.service.ProjectService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Sort;
@@ -199,9 +201,27 @@ public class ProjectController {
                     "     @projectService.findById(#id).team.id == authentication.principal.team.id ) " +
                     "or hasRole('ROLE_ADMIN')"
     )
-    public String view(@PathVariable Long id, Model model) {
+    public String view(@PathVariable Long id,
+                       Model model,
+                       @AuthenticationPrincipal User currentUser) {
         Project project = projectService.findById(id);
+
+        List<Task> tasks;
+        boolean isOwner = currentUser.getId().equals(project.getOwner().getId());
+        boolean isAdmin = currentUser.getRole() == Role.ROLE_ADMIN;
+        if (isOwner || isAdmin) {
+            tasks = project.getTasks();
+        } else {
+            tasks = project.getTasks().stream()
+                    .filter(t ->
+                            (t.getAssignedUser() != null && t.getAssignedUser().getId().equals(currentUser.getId())) ||
+                            t.getParticipants().contains(currentUser)
+                    )
+                    .toList();
+        }
+
         model.addAttribute("project", project);
+        model.addAttribute("tasks", tasks);
         model.addAttribute("title", "Детали проекта «" + project.getName() + "»");
         return "project/details";
     }
