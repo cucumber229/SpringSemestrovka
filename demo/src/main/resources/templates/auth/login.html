@@ -10,63 +10,55 @@
 <body>
 <!-- попадёт в <main layout:fragment="content"> -->
 <div layout:fragment="content">
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-md-6">
-        <div class="card mt-5 shadow-sm">
-          <div class="card-header bg-primary text-white">
-            <h3 class="mb-0">Вход</h3>
+  <div>
+    <div>
+      <div>
+        <div>
+          <div>
+            <h3>Вход</h3>
           </div>
-          <div class="card-body">
+          <div>
             <!-- сообщение об успешной регистрации -->
-            <div th:if="${registered}" class="alert alert-success mt-2 mb-4">
+            <div th:if="${registered}">
               Регистрация прошла успешно! Пожалуйста, войдите.
             </div>
 
             <!-- сообщение об ошибке при входе -->
-            <div th:if="${loginError}" class="alert alert-danger mt-2 mb-4">
+            <div th:if="${loginError}">
               Неверное имя пользователя или пароль
             </div>
 
-            <form th:action="@{/login}" method="post" class="needs-validation" novalidate>
+            <form th:action="@{/login}" method="post">
               <!-- CSRF токен -->
               <input type="hidden"
                      th:name="${_csrf.parameterName}"
                      th:value="${_csrf.token}"/>
 
-              <div class="mb-3">
-                <label for="username" class="form-label">Имя пользователя</label>
+              <div>
+                <label for="username">Имя пользователя</label>
                 <input type="text"
                        id="username"
                        name="username"
-                       class="form-control"
                        placeholder="Введите имя пользователя"
                        required>
-                <div class="invalid-feedback">
-                  Пожалуйста, введите имя пользователя.
-                </div>
               </div>
 
-              <div class="mb-3">
-                <label for="password" class="form-label">Пароль</label>
+              <div>
+                <label for="password">Пароль</label>
                 <input type="password"
                        id="password"
                        name="password"
-                       class="form-control"
                        placeholder="Введите пароль"
                        required>
-                <div class="invalid-feedback">
-                  Пожалуйста, введите пароль.
-                </div>
               </div>
 
-              <button type="submit" class="btn btn-primary w-100">Войти</button>
+              <button type="submit">Войти</button>
             </form>
 
-            <div class="text-center mt-4">
-              <p class="mb-0">
+            <div>
+              <p>
                 Нет аккаунта?
-                <a th:href="@{/register}" class="link-primary">Зарегистрироваться</a>
+                <a th:href="@{/register}">Зарегистрироваться</a>
               </p>
             </div>
           </div>
@@ -76,21 +68,6 @@
   </div>
 </div>
 
-<!-- Скрипт для валидации Bootstrap -->
-<script>
-  (function () {
-    'use strict';
-    const forms = document.querySelectorAll('.needs-validation');
-    Array.from(forms).forEach(function (form) {
-      form.addEventListener('submit', function (event) {
-        if (!form.checkValidity()) {
-          event.preventDefault();
-          event.stopPropagation();
-        }
-        form.classList.add('was-validated');
-      }, false);
-    });
-  })();
-</script>
+
 </body>
 </html>

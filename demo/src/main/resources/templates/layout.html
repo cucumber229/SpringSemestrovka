@@ -12,14 +12,14 @@
 
   <link rel="stylesheet" th:href="@{/css/style.css}"/>
 </head>
-<body class="d-flex flex-column min-vh-100">
+<body>
 <!-- Шапка -->
 <header>
   <div th:replace="fragments/header :: header"></div>
 </header>
 
 <!-- Основной контент (займёт всё доступное пространство) -->
-<main class="container flex-fill" layout:fragment="content"></main>
+<main layout:fragment="content"></main>
 
 <!-- Подвал (прижат к низу) -->
 <footer>
