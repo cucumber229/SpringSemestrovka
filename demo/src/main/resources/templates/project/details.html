@@ -32,7 +32,7 @@
         <a id="btnAddTask"
            class="btn-new-task"
            th:if="${project.owner.username == #authentication.name
-                    or #authentication.principal.role == 'ROLE_ADMIN'}"
+                    or #authorization.expression('hasRole(''ADMIN'')')}"
            th:href="@{|/projects/${project.id}/tasks/new|}">
           <span class="icon">➕</span>
           Новая задача
@@ -69,11 +69,11 @@
         </a>
         <div class="d-flex gap-3">
           <a th:if="${project.owner.username == #authentication.name
-                      or #authentication.principal.role == 'ROLE_ADMIN'}"
+                      or #authorization.expression('hasRole(''ADMIN'')')}"
              th:href="@{|/projects/${project.id}/edit|}"
              class="btn btn-outline-primary">Редактировать</a>
           <form th:if="${project.owner.username == #authentication.name
-                        or #authentication.principal.role == 'ROLE_ADMIN'}"
+                        or #authorization.expression('hasRole(''ADMIN'')')}"
                 th:action="@{|/projects/${project.id}/delete|}"
                 method="post"
                 class="d-inline">
@@ -102,25 +102,27 @@
             <th>Название</th>
             <th>Статус</th>
             <th>Исполнитель</th>
+            <th>Участники</th>
             <th class="text-end">Действия</th>
           </tr>
           </thead>
           <tbody>
-          <tr th:each="t : ${project.tasks}">
+          <tr th:each="t : ${tasks}">
             <td th:text="${t.title}">Task title</td>
             <td th:text="${t.status}">TODO</td>
             <td th:text="${t.assignedUser != null ? t.assignedUser.username : '—'}">—</td>
+            <td>
+              <span th:if="${#lists.isEmpty(t.participants)}">—</span>
+              <span th:each="p,iter : ${t.participants}">
+                <span th:text="${p.username}"></span><span th:if="${!iter.last}">, </span>
+              </span>
+            </td>
             <td class="text-end d-flex gap-2 justify-content-end">
               <a th:href="@{|/projects/${project.id}/tasks/${t.id}|}"
                  class="btn btn-sm btn-outline-secondary"
                  title="Просмотр">Просмотр</a>
-              <a th:if="${project.owner.username == #authentication.name
-                            or #authentication.principal.role == 'ROLE_ADMIN'}"
-                 th:href="@{|/projects/${project.id}/tasks/${t.id}/edit|}"
-                 class="btn btn-sm btn-outline-primary"
-                 title="Редактировать">Редактировать</a>
               <form th:if="${project.owner.username == #authentication.name
-                               or #authentication.principal.role == 'ROLE_ADMIN'}"
+                               or #authorization.expression('hasRole(''ADMIN'')')}"
                     th:action="@{|/projects/${project.id}/tasks/${t.id}/delete|}"
                     method="post"
                     class="d-inline">
@@ -134,8 +136,8 @@
               </form>
             </td>
           </tr>
-          <tr th:if="${#lists.isEmpty(project.tasks)}">
-            <td colspan="4" class="text-center py-3">Задач нет</td>
+          <tr th:if="${#lists.isEmpty(tasks)}">
+            <td colspan="5" class="text-center py-3">Задач нет</td>
           </tr>
           </tbody>
         </table>
