@@ -56,7 +56,7 @@ public class TaskController {
     public String save(@PathVariable Long projectId,
                        @Valid @ModelAttribute("task") Task task,
                        BindingResult br,
-                       @RequestParam(value = "assigneeId", required = false) Long assigneeId,
+
                        @RequestParam(value = "participantIds", required = false) List<Long> participantIds,
                        Model model,
                        @AuthenticationPrincipal User currentUser) {
@@ -86,11 +86,25 @@ public class TaskController {
         Project project = projectService.findById(projectId);
         task.setProject(project);
 
-        if (assigneeId != null && assigneeId > 0) {
-            task.setAssignedUser(userService.findById(assigneeId));
-        } else {
-            task.setAssignedUser(null);
+
+        // Назначение участников задачи (M2M) только из членов команды
+        Set<User> participants = new HashSet<>();
+        if (participantIds != null) {
+            Set<Long> allowed = new HashSet<>();
+            if (project.getTeam() != null) {
+                for (User u : project.getTeam().getMembers()) {
+                    allowed.add(u.getId());
+                }
+            } else {
+                allowed.add(project.getOwner().getId());
+            }
+            for (Long uid : participantIds) {
+                if (allowed.contains(uid)) {
+                    participants.add(userService.findById(uid));
+                }
+            }
         }
+        task.setParticipants(participants);
 
         // Назначение участников задачи (M2M) только из членов команды
         Set<User> participants = new HashSet<>();
@@ -190,7 +204,10 @@ public class TaskController {
 
     /* ----------  УДАЛЕНИЕ УЧАСТНИКА ЗАДАЧИ  ---------- */
     @PostMapping("/{taskId}/participants/{userId}/delete")
-    public String removeParticipant(@PathVariable Long projectId,
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseBody
+    public void removeParticipant(@PathVariable Long projectId,
+
                                     @PathVariable Long taskId,
                                     @PathVariable Long userId,
                                     @AuthenticationPrincipal User currentUser) {
@@ -210,7 +227,6 @@ public class TaskController {
         task.getParticipants().removeIf(u -> u.getId().equals(userId));
         taskService.save(task);
 
-        return "redirect:/projects/" + projectId + "/tasks/" + taskId + "/edit";
     }
 
 }

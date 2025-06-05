@@ -55,18 +55,30 @@
             <div class="text-danger" th:errors="*{status}"></div>
           </div>
 
-          <!-- Исполнитель (если кандидатов > 1) -->
+
+          <!-- Исполнители (можно выбрать несколько) -->
           <div class="mb-3" th:if="${#lists.size(candidates) > 1}">
-            <label for="assigneeId" class="form-label">Исполнитель</label>
-            <select id="assigneeId" name="assigneeId" class="form-select">
-              <option value="">– не назначен –</option>
-              <option th:each="u : ${candidates}"
-                      th:value="${u.id}"
-                      th:text="${u.username}"
-                      th:selected="${task.assignedUser != null && u.id == task.assignedUser.id}">
-              </option>
-            </select>
+            <label for="participantIds" class="form-label">Исполнители</label>
+          <select id="participantIds" name="participantIds" multiple class="form-select">
+            <option th:each="u : ${candidates}"
+                    th:value="${u.id}"
+                    th:text="${u.username}"
+                    th:selected="${task.participants.contains(u)}">
+            </option>
+          </select>
+          <div class="mt-2" th:if="${task.id != null && !#lists.isEmpty(task.participants)}">
+            <div class="mb-1">Назначенные:</div>
+            <ul id="participantsList" class="list-unstyled mb-0">
+              <li th:each="p : ${task.participants}" class="participant-item">
+                <span th:text="${p.username}"></span>
+                <button type="button"
+                        class="btn btn-sm btn-link text-danger p-0 btn-remove-participant"
+                        th:data-user-id="${p.id}"
+                        th:if="${project.owner.username == #authentication.name or #authorization.expression('hasRole(''ADMIN'')')}">×</button>
+              </li>
+            </ul>
           </div>
+        </div>
 
           <!-- Исполнители (можно выбрать несколько) -->
           <div class="mb-3" th:if="${#lists.size(candidates) > 1}">
@@ -102,5 +114,34 @@
       </div>
     </div>
 </div>
+<script th:if="${task.id != null}" th:inline="javascript">
+  /*<![CDATA[*/
+  const projectId  = /*[[${projectId}]]*/ 0;
+  const taskId     = /*[[${task.id}]]*/ 0;
+  const csrfHeader = /*[['${_csrf.headerName}']]*/ 'X-CSRF-TOKEN';
+  const csrfToken  = /*[['${_csrf.token}']]*/ '';
+
+  document.querySelectorAll('.btn-remove-participant').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if (!confirm('Удалить исполнителя из задачи?')) return;
+      const userId = btn.dataset.userId;
+      const resp = await fetch(`/projects/${projectId}/tasks/${taskId}/participants/${userId}/delete`, {
+        method: 'POST',
+        headers: { [csrfHeader]: csrfToken }
+      });
+      if (resp.ok) {
+        const li = btn.closest('.participant-item');
+        li.remove();
+        const list = document.getElementById('participantsList');
+        if (list.children.length === 0) {
+          list.innerHTML = '<li class="text-muted">Исполнителей нет</li>';
+        }
+      } else {
+        alert('Ошибка удаления исполнителя');
+      }
+    });
+  });
+  /*]]>*/
+</script>
 </body>
 </html>

@@ -67,15 +67,15 @@
         </tr>
         <tr>
           <th>Исполнители</th>
-          <td>
+          <td id="participantsContainer">
             <span th:if="${#lists.isEmpty(task.participants)}">—</span>
-            <span th:each="p,iter : ${task.participants}" class="me-2">
+            <span th:each="p,iter : ${task.participants}" class="participant-item me-2">
               <span th:text="${p.username}"></span>
-              <form th:if="${project.owner.username == #authentication.name or #authorization.expression('hasRole(''ADMIN'')')}"
-                    th:action="@{|/projects/${project.id}/tasks/${task.id}/participants/${p.id}/delete|}"
-                    method="post" class="d-inline">
-                <button type="submit" class="btn btn-sm btn-link text-danger p-0">×</button>
-              </form>
+              <button type="button"
+                      class="btn btn-sm btn-link text-danger p-0 btn-remove-participant"
+                      th:data-user-id="${p.id}"
+                      th:if="${project.owner.username == #authentication.name or #authorization.expression('hasRole(''ADMIN'')')}">×</button>
+
               <span th:if="${!iter.last}">, </span>
             </span>
           </td>
@@ -138,5 +138,35 @@
   </div>
 
 </div>
+
+<script th:inline="javascript">
+  /*<![CDATA[*/
+  const projectId  = /*[[${project.id}]]*/ 0;
+  const taskId     = /*[[${task.id}]]*/ 0;
+  const csrfHeader = /*[['${_csrf.headerName}']]*/ 'X-CSRF-TOKEN';
+  const csrfToken  = /*[['${_csrf.token}']]*/ '';
+
+  document.querySelectorAll('.btn-remove-participant').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if (!confirm('Удалить исполнителя из задачи?')) return;
+      const userId = btn.dataset.userId;
+      const resp = await fetch(`/projects/${projectId}/tasks/${taskId}/participants/${userId}/delete`, {
+        method: 'POST',
+        headers: { [csrfHeader]: csrfToken }
+      });
+      if (resp.ok) {
+        const item = btn.closest('.participant-item');
+        item.remove();
+        const container = document.getElementById('participantsContainer');
+        if (container.querySelectorAll('.participant-item').length === 0) {
+          container.textContent = '—';
+        }
+      } else {
+        alert('Ошибка удаления исполнителя');
+      }
+    });
+  });
+  /*]]>*/
+</script>
 </body>
 </html>
