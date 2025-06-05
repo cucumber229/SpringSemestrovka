@@ -33,6 +33,7 @@
            class="btn-new-task"
            th:if="${project.owner.username == #authentication.name
                     or #authorization.expression('hasRole(''ADMIN'')')}"
+
            th:href="@{|/projects/${project.id}/tasks/new|}">
           <span class="icon">➕</span>
           Новая задача
@@ -69,11 +70,13 @@
         </a>
         <div class="d-flex gap-3">
           <a th:if="${project.owner.username == #authentication.name
+
                       or #authorization.expression('hasRole(''ADMIN'')')}"
              th:href="@{|/projects/${project.id}/edit|}"
              class="btn btn-outline-primary">Редактировать</a>
           <form th:if="${project.owner.username == #authentication.name
                         or #authorization.expression('hasRole(''ADMIN'')')}"
+
                 th:action="@{|/projects/${project.id}/delete|}"
                 method="post"
                 class="d-inline">
@@ -123,6 +126,7 @@
                  title="Просмотр">Просмотр</a>
               <form th:if="${project.owner.username == #authentication.name
                                or #authorization.expression('hasRole(''ADMIN'')')}"
+
                     th:action="@{|/projects/${project.id}/tasks/${t.id}/delete|}"
                     method="post"
                     class="d-inline">
@@ -138,6 +142,7 @@
           </tr>
           <tr th:if="${#lists.isEmpty(tasks)}">
             <td colspan="5" class="text-center py-3">Задач нет</td>
+
           </tr>
           </tbody>
         </table>

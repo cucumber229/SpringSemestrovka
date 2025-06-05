@@ -107,6 +107,7 @@ public class TaskController {
                 if (allowed.contains(uid)) {
                     participants.add(userService.findById(uid));
                 }
+
             }
         }
         task.setParticipants(participants);
