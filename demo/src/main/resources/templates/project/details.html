@@ -126,7 +126,7 @@
                  title="Просмотр">Просмотр</a>
               <form th:if="${project.owner.username == #authentication.name
                                or #authorization.expression('hasRole(''ADMIN'')')}"
-n
+
                     th:action="@{|/projects/${project.id}/tasks/${t.id}/delete|}"
                     method="post"
                     class="d-inline">

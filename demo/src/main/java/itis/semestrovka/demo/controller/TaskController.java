@@ -188,4 +188,29 @@ public class TaskController {
         return "redirect:/projects/" + projectId + "/tasks/" + id;
     }
 
+    /* ----------  УДАЛЕНИЕ УЧАСТНИКА ЗАДАЧИ  ---------- */
+    @PostMapping("/{taskId}/participants/{userId}/delete")
+    public String removeParticipant(@PathVariable Long projectId,
+                                    @PathVariable Long taskId,
+                                    @PathVariable Long userId,
+                                    @AuthenticationPrincipal User currentUser) {
+
+        Task task = taskService.findById(taskId);
+        Project project = projectService.findById(projectId);
+
+        boolean isAdmin = SecurityContextHolder.getContext().getAuthentication()
+                .getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        boolean isOwner = project.getOwner().getId().equals(currentUser.getId());
+
+        if (!(isOwner || isAdmin)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        task.getParticipants().removeIf(u -> u.getId().equals(userId));
+        taskService.save(task);
+
+        return "redirect:/projects/" + projectId + "/tasks/" + taskId + "/edit";
+    }
+
 }

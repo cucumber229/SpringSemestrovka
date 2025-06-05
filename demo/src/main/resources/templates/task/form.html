@@ -71,15 +71,28 @@
           <!-- Исполнители (можно выбрать несколько) -->
           <div class="mb-3" th:if="${#lists.size(candidates) > 1}">
             <label for="participantIds" class="form-label">Исполнители</label>
-
-            <select id="participantIds" name="participantIds" multiple class="form-select">
-              <option th:each="u : ${candidates}"
-                      th:value="${u.id}"
-                      th:text="${u.username}"
-                      th:selected="${task.participants.contains(u)}">
-              </option>
-            </select>
+          <select id="participantIds" name="participantIds" multiple class="form-select">
+            <option th:each="u : ${candidates}"
+                    th:value="${u.id}"
+                    th:text="${u.username}"
+                    th:selected="${task.participants.contains(u)}">
+            </option>
+          </select>
+          <div class="mt-2" th:if="${task.id != null && !#lists.isEmpty(task.participants)}">
+            <div class="mb-1">Назначенные:</div>
+            <ul class="list-unstyled mb-0">
+              <li th:each="p : ${task.participants}">
+                <span th:text="${p.username}"></span>
+                <form th:if="${project.owner.username == #authentication.name or #authorization.expression('hasRole(''ADMIN'')')}"
+                      th:action="@{|/projects/${projectId}/tasks/${task.id}/participants/${p.id}/delete|}"
+                      method="post" class="d-inline ms-1">
+                  <button type="submit" class="btn btn-sm btn-link text-danger p-0">×</button>
+                </form>
+              </li>
+            </ul>
           </div>
+        </div>
+
 
           <!-- Кнопки -->
           <div class="d-flex justify-content-between">

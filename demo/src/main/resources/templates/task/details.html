@@ -67,11 +67,17 @@
         </tr>
         <tr>
           <th>Исполнители</th>
-
           <td>
             <span th:if="${#lists.isEmpty(task.participants)}">—</span>
-            <span th:each="p,iter : ${task.participants}">
-              <span th:text="${p.username}"></span><span th:if="${!iter.last}">, </span>
+            <span th:each="p,iter : ${task.participants}" class="me-2">
+              <span th:text="${p.username}"></span>
+              <form th:if="${project.owner.username == #authentication.name or #authorization.expression('hasRole(''ADMIN'')')}"
+                    th:action="@{|/projects/${project.id}/tasks/${task.id}/participants/${p.id}/delete|}"
+                    method="post" class="d-inline">
+                <button type="submit" class="btn btn-sm btn-link text-danger p-0">×</button>
+              </form>
+              <span th:if="${!iter.last}">, </span>
+
             </span>
           </td>
         </tr>
