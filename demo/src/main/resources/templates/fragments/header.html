@@ -4,19 +4,12 @@
      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
      class="navbar navbar-expand-lg navbar-dark shadow-sm">
   <div class="container">
-    <a class="navbar-brand" th:href="@{/}">
-      <i class="bi bi-people-fill me-1"></i> TeamManager
-    </a>
-    <button class="navbar-toggler" type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarMenu"
-            aria-controls="navbarMenu"
-            aria-expanded="false"
-            aria-label="Переключить навигацию">
+    <a class="navbar-brand" th:href="@{/}">TeamManager</a>
+    <button class="navbar-toggler" type="button" id="navbarToggler" aria-controls="navbarMenu" aria-expanded="false" aria-label="Переключить навигацию">
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <div class="collapse navbar-collapse" id="navbarMenu">
+    <div class="navbar-collapse" id="navbarMenu">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
           <a class="nav-link"
@@ -79,3 +72,12 @@
     </div>
   </div>
 </nav>
+<script>
+  const navbarToggler = document.getElementById('navbarToggler');
+  const navbarMenu    = document.getElementById('navbarMenu');
+  if (navbarToggler && navbarMenu) {
+    navbarToggler.addEventListener('click', () => {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+</script>

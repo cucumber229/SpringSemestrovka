@@ -21,16 +21,12 @@
               </a>
               <a th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}"
                  th:href="@{|/teams/${team.id}/edit|}"
-                 class="btn btn-sm btn-outline-light me-2">
-                <i class="bi bi-pencil me-1"></i> Редактировать
-              </a>
+                 class="btn btn-sm btn-outline-light me-2">Редактировать</a>
               <form th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}"
                     th:action="@{|/teams/${team.id}/delete|}"
                     method="post"
                     class="d-inline">
-                <button type="submit" class="btn btn-sm btn-danger">
-                  <i class="bi bi-trash me-1"></i> Удалить
-                </button>
+                <button type="submit" class="btn btn-sm btn-danger">Удалить</button>
               </form>
             </div>
           </div>
@@ -70,9 +66,7 @@
                           method="post" class="d-inline">
                       <input type="hidden" name="userId" th:value="${u.id}"/>
                       <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-                      <button type="submit" class="btn btn-sm btn-outline-danger">
-                        <i class="bi bi-person-dash me-1"></i> Убрать
-                      </button>
+                      <button type="submit" class="btn btn-sm btn-outline-danger">Убрать</button>
                     </form>
                   </td>
                 </tr>
@@ -84,9 +78,7 @@
             </div>
 
             <div th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}" class="text-end">
-              <a th:href="@{|/teams/${team.id}/add-user|}" class="btn btn-sm btn-success">
-                <i class="bi bi-person-plus me-1"></i> Добавить пользователя
-              </a>
+              <a th:href="@{|/teams/${team.id}/add-user|}" class="btn btn-sm btn-success">Добавить пользователя</a>
             </div>
           </div>
         </div>

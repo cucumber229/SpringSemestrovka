@@ -93,3 +93,38 @@ header .nav-link.active::after {
     width: 100%;
     background-color: #ffd700;     /* цвет линии у активной ссылки */
 }
+
+/* Простая модалка без Bootstrap */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    align-items: center;
+    justify-content: center;
+}
+.modal.show {
+    display: flex;
+}
+.modal-dialog {
+    background: #fff;
+    padding: 1rem;
+    border-radius: .5rem;
+    max-width: 500px;
+    width: 100%;
+}
+
+/* Простое меню навигации */
+.navbar-toggler {
+    cursor: pointer;
+    border: none;
+    background: transparent;
+}
+
+.navbar-collapse {
+    display: none;
+}
+
+.navbar-collapse.show {
+    display: block;
+}

@@ -93,9 +93,7 @@
         th:if="${project.owner.username == #authentication.name
         or #authentication.principal.role == 'ROLE_ADMIN'}"
         th:href="@{|/projects/${project.id}/tasks/new|}"
-        class="btn btn-success btn-sm">
-        <i class="bi bi-plus-lg me-1"></i> Новая задача
-        </a>
+        class="btn btn-success btn-sm">Новая задача</a>
       </div>
 
       <div class="table-responsive">
@@ -120,18 +118,14 @@
             <!-- Единственная кнопка-глазик доступна всем -->
             <a th:href="@{|/projects/${project.id}/tasks/${t.id}|}"
                class="btn btn-sm btn-outline-secondary me-2"
-               title="Просмотр">
-              <i class="bi bi-eye"></i>
-            </a>
+               title="Просмотр">Просмотр</a>
 
             <!-- edit / delete только владельцу или ADMIN -->
             <a th:if="${project.owner.username == #authentication.name
                          or #authentication.principal.role == 'ROLE_ADMIN'}"
                th:href="@{|/projects/${project.id}/tasks/${t.id}/edit|}"
                class="btn btn-sm btn-outline-primary me-2"
-               title="Редактировать">
-              <i class="bi bi-pencil"></i>
-            </a>
+               title="Редактировать">Редактировать</a>
 
             <form th:if="${project.owner.username == #authentication.name
                             or #authentication.principal.role == 'ROLE_ADMIN'}"
@@ -140,9 +134,7 @@
               <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
               <button class="btn btn-sm btn-outline-danger"
                       title="Удалить"
-                      onclick="return confirm('Удалить задачу?');">
-                <i class="bi bi-trash"></i>
-              </button>
+                      onclick="return confirm('Удалить задачу?');">Удалить</button>
             </form>
           </td>
         </tr>
@@ -165,7 +157,7 @@
     <form id="taskForm" class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Новая задача</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <button type="button" class="btn-close"></button>
       </div>
 
       <div class="modal-body">
@@ -198,11 +190,18 @@
   const csrfToken  = /*[['${_csrf.token}']]*/ '';
 
   // ---------- открыть модалку ----------
-  const btnAdd = document.getElementById('btnAddTask');
+  const modal   = document.getElementById('taskModal');
+  const btnAdd  = document.getElementById('btnAddTask');
+  const btnClose = modal.querySelector('.btn-close');
+
+  function showModal()  { modal.classList.add('show'); }
+  function hideModal()  { modal.classList.remove('show'); }
+
   if (btnAdd) btnAdd.addEventListener('click', e => {
     e.preventDefault();
-    new bootstrap.Modal(document.getElementById('taskModal')).show();
+    showModal();
   });
+  if (btnClose) btnClose.addEventListener('click', hideModal);
 
   // ---------- отправка формы ----------
   document.getElementById('taskForm').addEventListener('submit', async e => {
@@ -222,7 +221,7 @@
     if (resp.ok) {
       const task = await resp.json();
       addRow(task);
-      bootstrap.Modal.getInstance(document.getElementById('taskModal')).hide();
+      hideModal();
       form.reset();
     } else {
       alert('Ошибка сохранения задачи');
@@ -238,9 +237,7 @@
     <td>${t.status}</td>
     <td>${t.assignedUsername ?? '—'}</td>
     <td class="text-end">
-       <a href="/projects/${projectId}/tasks/${t.id}" class="btn btn-sm btn-outline-secondary me-2">
-         <i class="bi bi-eye"></i>
-       </a>
+       <a href="/projects/${projectId}/tasks/${t.id}" class="btn btn-sm btn-outline-secondary me-2">Просмотр</a>
     </td>`;
     tbody.appendChild(tr);
   }

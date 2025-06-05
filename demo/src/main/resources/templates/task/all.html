@@ -38,9 +38,7 @@
                         <td th:text="${t.assignedUser != null ? t.assignedUser.username : '—'}">—</td>
 
                         <td class="text-end">
-                            <a th:href="@{|/projects/${t.project.id}/tasks/${t.id}|}" class="btn btn-sm btn-outline-secondary">
-                                <i class="bi bi-eye"></i>
-                            </a>
+                            <a th:href="@{|/projects/${t.project.id}/tasks/${t.id}|}" class="btn btn-sm btn-outline-secondary">Просмотр</a>
                         </td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(tasks)}">
