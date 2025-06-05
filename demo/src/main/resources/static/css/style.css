@@ -1,19 +1,24 @@
 
 body {
+
     font-family: 'Montserrat', sans-serif;
     background: linear-gradient(120deg, #f0f4f8 0%, #d9e4ec 100%);
+
     min-height: 100vh;
 }
 
 .navbar,
 .footer {
+
     background: linear-gradient(90deg, #00b4db, #0083b0);
+
 }
 
 .navbar a,
 .footer {
     color: #ffffff !important;
 }
+
 
 
 .card {
@@ -29,6 +34,7 @@ body {
 
 .btn-main {
     background: #0083b0;
+
     color: #fff;
     border-radius: .5rem;
     font-weight: 500;
