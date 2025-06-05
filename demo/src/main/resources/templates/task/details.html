@@ -28,7 +28,7 @@
 
       <!-- Кнопки справа -->
       <div class="d-flex gap-2"
-           th:if="${project.owner.username == #authentication.name or #authentication.principal.role == 'ROLE_ADMIN'}">
+           th:if="${project.owner.username == #authentication.name or #authorization.expression('hasRole(''ROLE_ADMIN'')')}">
         <a th:href="@{|/projects/${project.id}/tasks/${task.id}/edit|}"
            class="btn btn-sm btn-outline-light"
            title="Редактировать">
@@ -63,6 +63,15 @@
         <tr>
           <th>Исполнитель</th>
           <td th:text="${task.assignedUser != null ? task.assignedUser.username : '—'}">123456</td>
+        </tr>
+        <tr>
+          <th>Участники</th>
+          <td>
+            <span th:if="${#lists.isEmpty(task.participants)}">—</span>
+            <span th:each="p,iter : ${task.participants}">
+              <span th:text="${p.username}"></span><span th:if="${!iter.last}">, </span>
+            </span>
+          </td>
         </tr>
         <tr>
           <th>Проект</th>
