@@ -14,6 +14,8 @@ public interface TaskService {
     void deleteById(Long id);            // удалить без проверки projectId
     Task findById(Long id);
     List<Task> findAllByProject(Long projectId);
+    List<Task> findAll();
+    List<Task> findAllByUser(Long userId);
 
     /*=== REST / AJAX ===*/
     Task create(Project project, TaskDto dto);     // POST JSON → Task
