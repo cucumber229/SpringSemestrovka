@@ -47,9 +47,7 @@
                 <div class="card shadow-sm">
                     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                         <h3 class="mb-0" th:text="${title}">Проекты</h3>
-                        <a class="btn btn-success" th:href="@{/projects/new}">
-                            <i class="bi bi-plus-lg me-1"></i> Новый проект
-                        </a>
+                        <a class="btn btn-success" th:href="@{/projects/new}">Новый проект</a>
                     </div>
                     <div class="card-body p-0">
                         <div class="table-responsive">
@@ -127,9 +125,7 @@
                                             <!-- Просмотр (глазик) – всем, кто видит эту строку -->
                                             <a th:href="@{|/projects/${p.id}/view|}"
                                                class="btn btn-sm btn-outline-secondary me-2"
-                                               title="Просмотреть">
-                                                <i class="bi bi-eye"></i>
-                                            </a>
+                                               title="Просмотреть">Просмотр</a>
 
 
 
@@ -143,9 +139,7 @@
                                                 <button type="submit"
                                                         class="btn btn-sm btn-outline-danger"
                                                         title="Удалить"
-                                                        onclick="return confirm('Удалить проект?');">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
+                                                        onclick="return confirm('Удалить проект?');">Удалить</button>
                                             </form>
                                         </div>
                                     </td>

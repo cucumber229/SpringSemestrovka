@@ -18,9 +18,7 @@
                         <!-- Кнопка «Перейти в админку» для ADMIN -->
                         <a th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}"
                            th:href="@{/teams/admin}"
-                           class="btn btn-secondary btn-sm">
-                            <i class="bi bi-gear me-1"></i> Управление командами
-                        </a>
+                           class="btn btn-secondary btn-sm">Управление командами</a>
                     </div>
                     <div class="card-body p-0">
                         <div class="table-responsive">
@@ -41,9 +39,7 @@
                                     <td class="d-flex flex-wrap">
                                         <!-- Кнопка «Просмотреть» доступна wsz воcем пользователям -->
                                         <a th:href="@{|/teams/${t.id}/view|}"
-                                           class="btn btn-sm btn-outline-primary me-2 mb-1">
-                                            <i class="bi bi-eye me-1"></i> Просмотреть
-                                        </a>
+                                           class="btn btn-sm btn-outline-primary me-2 mb-1">Просмотреть</a>
 
 
                                         <!-- Форма «Удалить» для ADMIN -->
@@ -52,9 +48,7 @@
                                               method="post"
                                               class="mb-1"
                                               style="display:inline">
-                                            <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                <i class="bi bi-trash me-1"></i> Удалить
-                                            </button>
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">Удалить</button>
                                         </form>
                                     </td>
                                 </tr>
