@@ -59,8 +59,7 @@
                  class="btn btn-outline-primary btn-sm me-2">Редактировать</a>
               <!-- Форма «Удалить» -->
               <form th:action="@{|/projects/${project.id}/delete|}"
-                    method="post"
-                    style="display:inline">
+                    method="post">
                 <button type="submit"
                         class="btn btn-outline-danger btn-sm">Удалить</button>
               </form>
@@ -104,8 +103,7 @@
                     <!-- Форма «Удалить» -->
                     <form th:action="@{|/projects/${project.id}/tasks/${task.id}/delete|}"
                           method="post"
-                          class="mb-1"
-                          style="display:inline">
+                          class="mb-1">
                       <button type="submit"
                               class="btn btn-sm btn-outline-danger">Удалить</button>
                     </form>
