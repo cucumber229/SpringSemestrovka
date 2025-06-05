@@ -83,9 +83,12 @@
       </table>
     </div>
 
-    <div class="card-footer text-start">
+    <div class="card-footer d-flex justify-content-between">
       <a th:href="@{|/projects/${project.id}/view|}" class="btn btn-outline-secondary">
-        ← Назад к проекту
+        ← В проект
+      </a>
+      <a th:href="@{/tasks}" class="btn btn-outline-secondary">
+        Ко всем задачам
       </a>
     </div>
   </div>
