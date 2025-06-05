@@ -73,7 +73,23 @@
     </div>
     <!-- ===== /Карточка задачи ===== -->
 
-    <!-- Здесь позже можно вывести комментарии, вложения и т.п. -->
+    <!-- ===== Комментарии ===== -->
+    <div class="card shadow-sm mb-4">
+      <div class="card-header">
+        <h5 class="mb-0">Комментарии</h5>
+      </div>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item" th:each="comment : ${comments}">
+          <strong th:text="${comment.user.username}">user</strong>:
+          <span th:text="${comment.content}">content</span>
+          <small class="text-muted ms-2"
+                th:text="${#temporals.format(comment.createdAt, 'dd.MM.yyyy HH:mm')}">date</small>
+        </li>
+        <li class="list-group-item" th:if="${#lists.isEmpty(comments)}">
+          Комментариев пока нет
+        </li>
+      </ul>
+    </div>
   </div>
 </div>
 </body>

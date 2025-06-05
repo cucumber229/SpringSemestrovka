@@ -43,7 +43,7 @@ public class Task {
     )
     private Set<User> participants = new HashSet<>();
 
-    // Заглушка для списка комментариев
-    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL)
-    private List<Comment> comments;
+    // Список комментариев по задаче
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
 }

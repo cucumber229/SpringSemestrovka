@@ -4,9 +4,11 @@ package itis.semestrovka.demo.controller;
 import itis.semestrovka.demo.model.entity.Project;
 import itis.semestrovka.demo.model.entity.Task;
 import itis.semestrovka.demo.model.entity.User;
+import itis.semestrovka.demo.model.entity.Comment;
 import itis.semestrovka.demo.service.ProjectService;
 import itis.semestrovka.demo.service.TaskService;
 import itis.semestrovka.demo.service.UserService;
+import itis.semestrovka.demo.service.CommentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,6 +30,7 @@ public class TaskController {
     private final TaskService    taskService;
     private final ProjectService projectService;
     private final UserService    userService;   // ← добавили
+    private final CommentService commentService;
 
     /* ----------  ФОРМА СОЗДАНИЯ  ---------- */
     @GetMapping("/new")
@@ -113,6 +116,7 @@ public class TaskController {
 
         Task    task    = taskService.findById(id);
         Project project = projectService.findById(projectId);
+        List<Comment> comments = commentService.findAllByTaskId(id);
 
         // доступ: владелец проекта, любой из команды или ADMIN
         boolean allowed =
@@ -129,6 +133,7 @@ public class TaskController {
 
         model.addAttribute("task",    task);
         model.addAttribute("project", project);          // ← добавили
+        model.addAttribute("comments", comments);
         model.addAttribute("projectId", projectId);
         model.addAttribute("title", "Задача «" + task.getTitle() + "»");
         return "task/details";
