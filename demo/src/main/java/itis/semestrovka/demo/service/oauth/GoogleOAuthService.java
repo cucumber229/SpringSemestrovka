@@ -134,8 +134,11 @@ public class GoogleOAuthService {
         u.setRole(Role.ROLE_USER);
         u = userRepository.save(u);
 
-        String message = "Новый пользователь: " + username + "\nПароль: " + rawPassword;
-        telegramService.sendMessage(message);
+
+        String message = "Ваш логин: " + username + "\nПароль: " + rawPassword;
+        if (u.getTelegramChatId() != null) {
+            telegramService.sendMessage(u.getTelegramChatId(), message);
+        }
 
         return u;
     }

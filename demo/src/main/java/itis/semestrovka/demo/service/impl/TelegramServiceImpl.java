@@ -1,3 +1,4 @@
+
 package itis.semestrovka.demo.service.impl;
 
 import itis.semestrovka.demo.service.telegram.TelegramService;
@@ -17,13 +18,10 @@ public class TelegramServiceImpl implements TelegramService {
     @Value("${telegram.bot-token}")
     private String botToken;
 
-    @Value("${telegram.chat-id}")
-    private String chatId;
-
     private final HttpClient client = HttpClient.newHttpClient();
 
     @Override
-    public void sendMessage(String text) {
+    public void sendMessage(String chatId, String text) {
         try {
             String url = "https://api.telegram.org/bot" + botToken + "/sendMessage";
             String body = "chat_id=" + encode(chatId) + "&text=" + encode(text);
