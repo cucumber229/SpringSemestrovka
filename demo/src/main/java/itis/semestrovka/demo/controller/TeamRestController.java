@@ -1,5 +1,4 @@
 package itis.semestrovka.demo.controller;
-
 import itis.semestrovka.demo.service.TeamService;
 import itis.semestrovka.demo.model.dto.TeamDto;
 import itis.semestrovka.demo.mapper.TeamConverter;
@@ -9,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 @RestController
 @RequestMapping("/api/teams")
 @RequiredArgsConstructor
@@ -17,10 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = "X-CSRF-TOKEN")
 @Tag(name = "Teams", description = "Operations with teams")
 public class TeamRestController {
-
     private final TeamService teamService;
-
-    /** Получить список всех команд. */
     @GetMapping
     @Operation(summary = "Get all teams")
     public java.util.List<TeamDto> getAll() {
@@ -28,23 +23,17 @@ public class TeamRestController {
                 .map(TeamConverter::toDto)
                 .toList();
     }
-
-    /** Создать новую команду. */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create team")
     public TeamDto create(@RequestBody TeamDto dto) {
         return TeamConverter.toDto(teamService.create(TeamConverter.toEntity(dto)));
     }
-
-    /** Получить конкретную команду по id. */
     @GetMapping("/{id}")
     @Operation(summary = "Get team by id")
     public TeamDto getById(@PathVariable Long id) {
         return TeamConverter.toDto(teamService.findById(id));
     }
-
-    /** Удаление пользователя из команды через AJAX */
     @DeleteMapping("/{teamId}/users/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Remove user from team")

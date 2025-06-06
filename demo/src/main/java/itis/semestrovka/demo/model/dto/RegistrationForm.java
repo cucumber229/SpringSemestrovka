@@ -1,4 +1,3 @@
-// src/main/java/itis/semestrovka/demo/model/dto/RegistrationForm.java
 package itis.semestrovka.demo.model.dto;
 
 import jakarta.validation.constraints.Email;

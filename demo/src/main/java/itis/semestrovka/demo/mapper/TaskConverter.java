@@ -1,19 +1,8 @@
 package itis.semestrovka.demo.mapper;
-
 import itis.semestrovka.demo.model.dto.TaskDto;
 import itis.semestrovka.demo.model.entity.Task;
 import itis.semestrovka.demo.model.entity.User;
-
-/**
- * Converter for {@link Task} and {@link TaskDto}.
- * <p>
- * Example usage:
- * {@code Task task = TaskConverter.toEntity(dto);}
- * {@code TaskDto dto = TaskConverter.toDto(task);}
- */
 public class TaskConverter {
-
-    /** Convert Task entity to DTO. */
     public static TaskDto toDto(Task task) {
         if (task == null) return null;
         TaskDto dto = new TaskDto();
@@ -25,8 +14,6 @@ public class TaskConverter {
         }
         return dto;
     }
-
-    /** Convert DTO to Task entity (without setting project). */
     public static Task toEntity(TaskDto dto) {
         if (dto == null) return null;
         Task task = new Task();

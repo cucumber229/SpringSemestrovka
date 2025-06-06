@@ -1,6 +1,4 @@
-// src/main/java/itis/semestrovka/demo/controller/ProjectController.java
 package itis.semestrovka.demo.controller;
-
 import itis.semestrovka.demo.model.entity.Project;
 import itis.semestrovka.demo.model.entity.Task;
 import itis.semestrovka.demo.model.entity.User;
@@ -15,27 +13,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
-
 @Controller
 @RequestMapping("/projects")
 public class ProjectController {
-
     private final ProjectService projectService;
-
     public ProjectController(ProjectService projectService) {
         this.projectService = projectService;
     }
-
-    /**
-     * 1) Список проектов. GET-параметры:
-     *    - type (возможные значения: all / team / personal; default = "all")
-     *    - sortField (имя поля, по которому сортируем; default = "name")
-     *    - sortDir   (asc или desc; default = "asc")
-     *
-     *    Если у пользователя нет команды, принудительно type = "personal"
-     */
     @GetMapping
     public String list(
             @RequestParam(value = "type", required = false, defaultValue = "all") String type,
@@ -45,53 +30,34 @@ public class ProjectController {
             @AuthenticationPrincipal User currentUser
     ) {
         boolean hasTeam = (currentUser.getTeam() != null);
-        // Если у пользователя нет команды, показываем только личные проекты
         if (!hasTeam) {
             type = "personal";
         }
-
-        // Сортировка: если field = "type", мы будем сортировать принудительно по приоритету team IS NULL / not null,
-        // иначе по любому существующему поле Project.
-        // Для простоты здесь поддерживаем только: name, owner.username, priority, и «type» (type=team/personal).
         Sort sort;
         Sort.Direction direction = sortDir.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
         if ("type".equals(sortField)) {
-            // «type» сортируем так: сначала все «Командные» (team != null), затем «Личные» (team is null)
-            // Чтобы завести такую логику через Sort, добавим virtual property "team.id" (некоторые СУБД разрешают)
-            // либо прямо сортируем по условию: (p.team is null) ASC — тогда командные (не null) будут выше.
-            // В JPA/Spring Data «team.id» null => приходит первым, поэтому если direction=ASC, «Личные» будут наверху.
-            // Чтоб поменять местами, просто инвертируем direction:
             if (direction == Sort.Direction.ASC) {
-                // ASC по team.id (пустые → NULL → «Личные» наверху, а хотелось бы «Командные»)
                 sort = Sort.by(Sort.Order.asc("team.id")).and(Sort.by(direction, "name"));
             } else {
-                // DESC по team.id (не NULL → сразу «Командные» идут первыми)
                 sort = Sort.by(Sort.Order.desc("team.id")).and(Sort.by(direction, "name"));
             }
         } else {
-            // Остальные поля: «name», «priority» или «owner.username»
-            // Для сортировки по владельцу: укажем «owner.username»
             sort = Sort.by(direction, sortField);
         }
-
         List<Project> projects;
         String title;
-
         if (!hasTeam) {
-            // Личные проекты
             projects = projectService.findAllByOwnerId(currentUser.getId(), sort);
             title = "Мои личные проекты";
         } else {
             Long teamId  = currentUser.getTeam().getId();
             Long ownerId = currentUser.getId();
-
             switch (type) {
                 case "team":
                     projects = projectService.findAllByTeamId(teamId, sort);
                     title = "Только командные проекты «" + currentUser.getTeam().getName() + "»";
                     break;
                 case "personal":
-                    // Только личные (team IS NULL)
                     projects = projectService.findAllByOwnerId(currentUser.getId(), sort)
                             .stream()
                             .filter(p -> p.getTeam() == null)
@@ -105,24 +71,16 @@ public class ProjectController {
                     break;
             }
         }
-
         model.addAttribute("projects", projects);
         model.addAttribute("hasTeam", hasTeam);
         model.addAttribute("type", type);
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDir", sortDir);
         model.addAttribute("title", title);
-
-        // Для удобства переключения направления сортировки (при клике на заголовок)
         String reverseDir = sortDir.equalsIgnoreCase("asc") ? "desc" : "asc";
         model.addAttribute("reverseDir", reverseDir);
-
         return "project/list";
     }
-
-    /**
-     * 2) Форма создания проекта.
-     */
     @GetMapping("/new")
     public String createForm(Model model, @AuthenticationPrincipal User currentUser) {
         model.addAttribute("project", new Project());
@@ -130,10 +88,6 @@ public class ProjectController {
         model.addAttribute("title", "Новый проект");
         return "project/form";
     }
-
-    /**
-     * 3) Сохранение (нового или редактируемого) проекта.
-     */
     @PostMapping
     public String save(
             @Valid @ModelAttribute("project") Project project,
@@ -148,24 +102,15 @@ public class ProjectController {
                     project.getId() == null ? "Новый проект" : "Редактирование проекта");
             return "project/form";
         }
-
-        // Назначаем владельца
         project.setOwner(currentUser);
-
-        // В зависимости от projectType: TEAM или PRIVATE
         if ("TEAM".equals(projectType) && currentUser.getTeam() != null) {
             project.setTeam(currentUser.getTeam());
         } else {
             project.setTeam(null);
         }
-
         projectService.save(project);
         return "redirect:/projects";
     }
-
-    /**
-     * 4) Форма редактирования.
-     */
     @GetMapping("/{id}/edit")
     @PreAuthorize(
             "@projectService.findById(#id).owner.username == authentication.name " +
@@ -178,10 +123,6 @@ public class ProjectController {
         model.addAttribute("title", "Редактировать проект");
         return "project/form";
     }
-
-    /**
-     * 5) Удаление проекта.
-     */
     @PostMapping("/{id}/delete")
     @PreAuthorize(
             "@projectService.findById(#id).owner.username == authentication.name " +
@@ -191,10 +132,6 @@ public class ProjectController {
         projectService.deleteById(id);
         return "redirect:/projects";
     }
-
-    /**
-     * 6) Просмотреть детали проекта.
-     */
     @GetMapping("/{id}/view")
     @PreAuthorize(
             "@projectService.findById(#id).owner.username == authentication.name " +
@@ -206,7 +143,6 @@ public class ProjectController {
                        Model model,
                        @AuthenticationPrincipal User currentUser) {
         Project project = projectService.findById(id);
-
         List<Task> tasks;
         boolean isOwner = currentUser.getId().equals(project.getOwner().getId());
         boolean isAdmin = currentUser.getRole() == Role.ROLE_ADMIN;
@@ -220,7 +156,6 @@ public class ProjectController {
                     )
                     .toList();
         }
-
         model.addAttribute("project", project);
         model.addAttribute("tasks", tasks);
         model.addAttribute("title", "Детали проекта «" + project.getName() + "»");

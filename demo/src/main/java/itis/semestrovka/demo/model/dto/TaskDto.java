@@ -1,4 +1,3 @@
-// src/main/java/itis/semestrovka/demo/dto/TaskDto.java
 package itis.semestrovka.demo.model.dto;
 
 import itis.semestrovka.demo.model.entity.Task;

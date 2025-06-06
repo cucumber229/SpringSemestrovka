@@ -1,6 +1,4 @@
-// src/main/java/itis/semestrovka/demo/controller/TaskController.java
 package itis.semestrovka.demo.controller;
-
 import itis.semestrovka.demo.model.entity.Project;
 import itis.semestrovka.demo.model.entity.Task;
 import itis.semestrovka.demo.model.entity.User;
@@ -21,58 +19,44 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
-
 @Hidden
 @Controller
 @RequestMapping("/projects/{projectId}/tasks")
 @RequiredArgsConstructor
 public class TaskController {
-
     private final TaskService    taskService;
     private final ProjectService projectService;
-    private final UserService    userService;   // ← добавили
+    private final UserService    userService;   
     private final CommentService commentService;
     private final SlackService slackService;
-
-    /* ----------  ФОРМА СОЗДАНИЯ  ---------- */
     @GetMapping("/new")
     public String newForm(@PathVariable Long projectId,
                           Model model,
                           @AuthenticationPrincipal User currentUser) {
-
         Project project = projectService.findById(projectId);
         List<User> candidates = (project.getTeam() != null)
                 ? project.getTeam().getMembers()
                 : List.of(project.getOwner());
-
         model.addAttribute("task", new Task());
         model.addAttribute("projectId", projectId);
         model.addAttribute("candidates", candidates);
         return "task/form";
     }
-
-    /* ----------  СОХРАНЕНИЕ (create / update)  ---------- */
-    @PostMapping                                    // *** единственный POST-метод ***
+    @PostMapping                                    
     public String save(@PathVariable Long projectId,
                        @Valid @ModelAttribute("task") Task task,
                        BindingResult br,
-
                        @RequestParam(value = "participantIds", required = false) List<Long> participantIds,
                        Model model,
                        @AuthenticationPrincipal User currentUser) {
-
-        // Валидация ------------------------------------------------------
         if (br.hasErrors()) {
             Project project = projectService.findById(projectId);
             List<User> candidates = (project.getTeam() != null)
                     ? project.getTeam().getMembers()
                     : List.of(project.getOwner());
-
-            // восстановить выбранных участников при ошибке валидации
             Set<User> selected = new HashSet<>();
             if (participantIds != null) {
                 for (Long uid : participantIds) {
@@ -80,25 +64,15 @@ public class TaskController {
                 }
             }
             task.setParticipants(selected);
-
             model.addAttribute("projectId", projectId);
             model.addAttribute("candidates", candidates);
             return "task/form";
         }
-
-        // Привязка к проекту
         Project project = projectService.findById(projectId);
         task.setProject(project);
-
-        // При создании задачи назначаем исполнителем автора
         if (task.getId() == null) {
             task.setAssignedUser(currentUser);
         }
-
-
-
-
-        // Назначение участников задачи (M2M) только из членов команды
         Set<User> participants = new HashSet<>();
         if (participantIds != null) {
             Set<Long> allowed = new HashSet<>();
@@ -116,49 +90,39 @@ public class TaskController {
             }
         }
         task.setParticipants(participants);
-
         taskService.save(task);
         slackService.sendTaskCreatedNotification(
                 project.getName(), task.getTitle(), currentUser.getUsername());
         return "redirect:/projects/" + projectId + "/view";
     }
-
-    /* ----------  ФОРМА РЕДАКТИРОВАНИЯ  ---------- */
     @GetMapping("/{id}/edit")
     public String editForm(@PathVariable Long projectId,
                            @PathVariable Long id,
                            Model model) {
-
         Project project = projectService.findById(projectId);
         List<User> candidates = (project.getTeam() != null)
                 ? project.getTeam().getMembers()
                 : List.of(project.getOwner());
-
         model.addAttribute("task", taskService.findById(id));
         model.addAttribute("project", project);
         model.addAttribute("projectId", projectId);
         model.addAttribute("candidates", candidates);
         return "task/form";
     }
-
-    /* ----------  УДАЛЕНИЕ  ---------- */
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable Long projectId,
                          @PathVariable Long id) {
         taskService.deleteById(id);
         return "redirect:/projects/" + projectId + "/view";
     }
-    /* ----------  ПРОСМОТР ОДНОЙ ЗАДАЧИ  ---------- */
     @GetMapping("/{id}")
     public String view(@PathVariable Long projectId,
                        @PathVariable Long id,
                        Model model,
                        @AuthenticationPrincipal User currentUser) {
-
         Task    task    = taskService.findById(id);
         Project project = projectService.findById(projectId);
         List<Comment> comments = commentService.findAllByTaskId(id);
-
         boolean isAdmin = SecurityContextHolder.getContext().getAuthentication()
                 .getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
@@ -166,22 +130,17 @@ public class TaskController {
         boolean isAssigned = (task.getAssignedUser() != null && task.getAssignedUser().getId().equals(currentUser.getId()))
                 || task.getParticipants().contains(currentUser);
         boolean isTeamMember = project.getTeam() != null && project.getTeam().getMembers().contains(currentUser);
-
         boolean allowed = isOwner || isAdmin || (isTeamMember && isAssigned);
-
         if (!allowed) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
-
         model.addAttribute("task",    task);
-        model.addAttribute("project", project);          // ← добавили
+        model.addAttribute("project", project);          
         model.addAttribute("comments", comments);
         model.addAttribute("projectId", projectId);
         model.addAttribute("title", "Задача «" + task.getTitle() + "»");
         return "task/details";
     }
-
-    /* ----------  ДОБАВЛЕНИЕ КОММЕНТАРИЯ  ---------- */
     @PostMapping("/{id}/comments")
     public String addComment(@PathVariable Long projectId,
                              @PathVariable Long id,
@@ -195,32 +154,23 @@ public class TaskController {
         commentService.save(comment);
         return "redirect:/projects/" + projectId + "/tasks/" + id;
     }
-
-    /* ----------  УДАЛЕНИЕ УЧАСТНИКА ЗАДАЧИ  ---------- */
     @PostMapping("/{taskId}/participants/{userId}/delete")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ResponseBody
     public void removeParticipant(@PathVariable Long projectId,
-
                                     @PathVariable Long taskId,
                                     @PathVariable Long userId,
                                     @AuthenticationPrincipal User currentUser) {
-
         Task task = taskService.findById(taskId);
         Project project = projectService.findById(projectId);
-
         boolean isAdmin = SecurityContextHolder.getContext().getAuthentication()
                 .getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
         boolean isOwner = project.getOwner().getId().equals(currentUser.getId());
-
         if (!(isOwner || isAdmin)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
-
         task.getParticipants().removeIf(u -> u.getId().equals(userId));
         taskService.save(task);
-
     }
-
 }
