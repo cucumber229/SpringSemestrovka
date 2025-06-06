@@ -1,5 +1,4 @@
 package itis.semestrovka.demo.exception;
-
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -11,20 +10,12 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.ModelAndView;
-
-/**
- * Global exception handler that returns JSON for REST controllers and
- * displays a custom error page for MVC controllers.
- */
 @ControllerAdvice
 public class GlobalExceptionHandler {
-
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
-
     private boolean isApiRequest(HttpServletRequest request) {
         return request.getRequestURI().startsWith("/api");
     }
-
     private Object buildResponse(HttpStatusCode status, String message, HttpServletRequest request) {
         if (isApiRequest(request)) {
             ErrorResponse body = new ErrorResponse(status.value(), message);
@@ -38,25 +29,21 @@ public class GlobalExceptionHandler {
         mav.addObject("error", message);
         return mav;
     }
-
     @ExceptionHandler(EntityNotFoundException.class)
     public Object handleEntityNotFound(EntityNotFoundException ex, HttpServletRequest request) {
         log.warn("Entity not found: {}", ex.getMessage());
         return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request);
     }
-
     @ExceptionHandler(IllegalArgumentException.class)
     public Object handleIllegalArgument(IllegalArgumentException ex, HttpServletRequest request) {
         log.warn("Illegal argument: {}", ex.getMessage());
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
     }
-
     @ExceptionHandler(ResponseStatusException.class)
     public Object handleResponseStatus(ResponseStatusException ex, HttpServletRequest request) {
         log.error("ResponseStatus exception: {}", ex.getMessage());
         return buildResponse(ex.getStatusCode(), ex.getReason() != null ? ex.getReason() : ex.getMessage(), request);
     }
-
     @ExceptionHandler(Exception.class)
     public Object handleOtherExceptions(Exception ex, HttpServletRequest request) {
         log.error("Unhandled exception", ex);

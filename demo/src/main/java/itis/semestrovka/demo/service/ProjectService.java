@@ -1,4 +1,3 @@
-// src/main/java/itis/semestrovka/demo/service/ProjectService.java
 package itis.semestrovka.demo.service;
 
 import itis.semestrovka.demo.model.entity.Project;
