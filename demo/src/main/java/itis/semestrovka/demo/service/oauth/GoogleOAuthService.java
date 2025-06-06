@@ -75,11 +75,12 @@ public class GoogleOAuthService {
 
         Optional<User> existing = userRepository.findByEmail(info.email());
         if (existing.isPresent()) {
-            return new OAuthResult(existing.get(), null);
+            User user = existing.get();
+            String pendingToken = findTokenByUserId(user.getId());
+            return new OAuthResult(user, pendingToken);
         }
-        RegisteredUser created = registerUser(info);
-        String tokenToBot = storePending(created.user().getId(), created.user().getUsername(), created.rawPassword());
-        return new OAuthResult(created.user(), tokenToBot);
+        RegisteredUser created = registerUser(info, session);
+        return new OAuthResult(created.user(), created.token());
     }
 
     private String fetchAccessToken(String code) throws IOException, InterruptedException {
@@ -121,7 +122,7 @@ public class GoogleOAuthService {
         );
     }
 
-    private RegisteredUser registerUser(GoogleUserInfo info) {
+    private RegisteredUser registerUser(GoogleUserInfo info, HttpSession session) {
         String baseUsername = info.name().replaceAll("\\s+", "").toLowerCase();
         if (baseUsername.isEmpty()) {
             baseUsername = info.email().split("@")[0];
@@ -144,6 +145,8 @@ public class GoogleOAuthService {
         // after the user links Telegram
         session.setAttribute("pendingUsername", username);
         session.setAttribute("pendingPassword", rawPassword);
+        String token = storePending(u.getId(), username, rawPassword);
+        session.setAttribute("telegramToken", token);
 
 
         String message = "Ваш логин: " + username + "\nПароль: " + rawPassword;
@@ -151,7 +154,7 @@ public class GoogleOAuthService {
             telegramService.sendMessage(u.getTelegramChatId(), message);
         }
 
-        return new RegisteredUser(u, rawPassword);
+        return new RegisteredUser(u, rawPassword, token);
     }
 
     private static String encode(String value) {
@@ -172,21 +175,20 @@ public class GoogleOAuthService {
     private record GoogleUserInfo(String id, String email, String name) {}
 
     /**
-     * Complete registration using the token provided in the Telegram link.
-     * Updates the user's phone and Telegram chat id and sends credentials to the phone.
+     * Complete registration when the Telegram bot receives a start token from the user.
+     * Credentials are sent to the provided chat id.
      */
-    public void completePhoneRegistration(String token, String phone, String chatId) {
+    public void completeTelegramRegistration(String token, String chatId) {
         PendingData data = pending.remove(token);
         if (data == null) {
             throw new IllegalArgumentException("Invalid token");
         }
         User user = userRepository.findById(data.userId()).orElseThrow();
-        user.setPhone(phone);
         user.setTelegramChatId(chatId);
         userRepository.save(user);
 
         String msg = "Ваш логин: " + data.username() + "\nПароль: " + data.rawPassword();
-        telegramService.sendMessageToPhone(phone, msg);
+        telegramService.sendMessage(chatId, msg);
     }
 
     private String storePending(long userId, String username, String rawPassword) {
@@ -195,10 +197,20 @@ public class GoogleOAuthService {
         return token;
     }
 
+    private String findTokenByUserId(long userId) {
+        for (Map.Entry<String, PendingData> e : pending.entrySet()) {
+            if (e.getValue().userId() == userId) {
+                return e.getKey();
+            }
+        }
+        return null;
+    }
+
+
     private record PendingData(long userId, String username, String rawPassword) {}
 
     public record OAuthResult(User user, String token) {}
 
-    private record RegisteredUser(User user, String rawPassword) {}
+    private record RegisteredUser(User user, String rawPassword, String token) {}
 
 }

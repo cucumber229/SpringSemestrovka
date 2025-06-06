@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.servlet.http.HttpSession;
 
 @RestController
 @RequestMapping("/telegram")
@@ -45,15 +46,13 @@ public class TelegramController {
     }
 
     /**
-     * Endpoint used by the Telegram bot to finish Google registration.
-     * It expects a token generated during OAuth login, the phone number
-     * entered by the user in Telegram and the chat id to reply to.
+     * Endpoint used by the Telegram bot when the user opens the link with a
+     * token. The bot passes the token and chat id so that the service can send
+     * the credentials to this chat.
      */
     @GetMapping("/complete")
-    public String complete(@RequestParam String token,
-                           @RequestParam String phone,
-                           @RequestParam String chatId) {
-        googleOAuthService.completePhoneRegistration(token, phone, chatId);
+    public String complete(@RequestParam String token, @RequestParam String chatId) {
+        googleOAuthService.completeTelegramRegistration(token, chatId);
         return "ok";
     }
 }
