@@ -1,0 +1,21 @@
+### Get all teams
+GET http://localhost:8080/api/teams
+X-CSRF-TOKEN: {{_csrf}}
+
+### Create a team
+POST http://localhost:8080/api/teams
+Content-Type: application/json
+X-CSRF-TOKEN: {{_csrf}}
+
+{
+  "name": "New team",
+  "description": "Optional description"
+}
+
+### Get team by id
+GET http://localhost:8080/api/teams/1
+X-CSRF-TOKEN: {{_csrf}}
+
+### Remove user from team
+DELETE http://localhost:8080/api/teams/1/users/2
+X-CSRF-TOKEN: {{_csrf}}

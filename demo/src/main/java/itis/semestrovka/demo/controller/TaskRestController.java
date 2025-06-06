@@ -8,6 +8,8 @@ import itis.semestrovka.demo.mapper.TaskConverter;
 import itis.semestrovka.demo.service.ProjectService;
 import itis.semestrovka.demo.service.TaskService;
 import itis.semestrovka.demo.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,6 +23,7 @@ import java.security.Principal;
 @RequiredArgsConstructor
 @RequestMapping("/api/projects/{projectId}/tasks")
 @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = "X-CSRF-TOKEN")
+@Tag(name = "Tasks", description = "Operations with project tasks")
 public class TaskRestController {
 
     private final TaskService    taskService;
@@ -30,6 +33,7 @@ public class TaskRestController {
     /* ----------  CREATE ЗАДАЧИ  ---------- */
     // POST /api/projects/{projectId}/tasks
     @PostMapping
+    @Operation(summary = "Create task")
     public TaskDto create(@PathVariable Long projectId,
                           @RequestBody @Valid TaskDto dto,
                           Principal principal) {
@@ -44,6 +48,7 @@ public class TaskRestController {
     /* ----------  DELETE ЗАДАЧИ  ---------- */
     // DELETE /api/projects/{projectId}/tasks/{taskId}
     @DeleteMapping("/{taskId}")
+    @Operation(summary = "Delete task")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long projectId,
                        @PathVariable Long taskId,
@@ -58,6 +63,7 @@ public class TaskRestController {
     /* ----------  ADD PARTICIPANT (добавить участника)  ---------- */
     // POST /api/projects/{projectId}/tasks/{taskId}/participants/{userId}
     @PostMapping("/{taskId}/participants/{userId}")
+    @Operation(summary = "Add participant to task")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addParticipant(@PathVariable Long projectId,
                                @PathVariable Long taskId,
@@ -91,6 +97,7 @@ public class TaskRestController {
     /* ----------  REMOVE PARTICIPANT (удалить участника)  ---------- */
     // DELETE /api/projects/{projectId}/tasks/{taskId}/participants/{userId}
     @DeleteMapping("/{taskId}/participants/{userId}")
+    @Operation(summary = "Remove participant from task")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeParticipant(@PathVariable Long projectId,
                                   @PathVariable Long taskId,
