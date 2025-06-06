@@ -11,27 +11,20 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequiredArgsConstructor
 public class UserProfileController {
 
     private final UserProfileService profileService;
-    @Value("${telegram.bot-link:https://t.me/your_bot}")
-    private String botLink;
 
     @GetMapping("/profile")
     public String view(@AuthenticationPrincipal User currentUser,
-                       HttpSession session,
                        Model model) {
         UserProfile profile = profileService.findByUserId(currentUser.getId());
         model.addAttribute("profile", profile);
         model.addAttribute("title", "Профиль");
-        String token = (String) session.getAttribute("telegramToken");
-        if (token != null) {
-            model.addAttribute("telegramLink", botLink + "?start=" + token);
-        }
+        
         return "profile/view";
     }
 

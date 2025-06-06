@@ -21,6 +21,4 @@ public interface UserService extends UserDetailsService {
     /** Обновить номер телефона пользователя */
     void updatePhone(User user, String phone);
 
-    /** Сохранить Telegram chatId пользователя */
-    void updateTelegramChatId(User user, String chatId);
 }

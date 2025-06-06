@@ -28,9 +28,6 @@ public class User implements UserDetails {
     @Column(unique = true, nullable = false)
     private String phone;
 
-    /** Telegram chat identifier for sending notifications */
-    @Column(name = "telegram_chat_id")
-    private String telegramChatId;
 
     @Column(nullable = false)
     private String password;

@@ -52,12 +52,16 @@ public class AuthController {
     public String loginForm(
             Model model,
             @RequestParam(required = false) String registered,
-            @RequestParam(required = false) String error
+            @RequestParam(required = false) String error,
+            HttpSession session
     ) {
         model.addAttribute("title", "Вход");
-        // если параметр присутствует (даже без значения), строка не null
         model.addAttribute("registered", registered != null);
         model.addAttribute("loginError", error != null);
+        model.addAttribute("prefillUsername", session.getAttribute("pendingUsername"));
+        model.addAttribute("prefillPassword", session.getAttribute("pendingPassword"));
+        session.removeAttribute("pendingUsername");
+        session.removeAttribute("pendingPassword");
         return "auth/login";
     }
 }

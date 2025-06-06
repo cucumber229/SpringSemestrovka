@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import itis.semestrovka.demo.model.entity.Role;
 import itis.semestrovka.demo.model.entity.User;
 import itis.semestrovka.demo.repository.UserRepository;
-import itis.semestrovka.demo.service.telegram.TelegramService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -41,23 +40,13 @@ public class GoogleOAuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final TelegramService telegramService;
     private final ObjectMapper mapper = new ObjectMapper();
 
-    /**
-     * Локальное хранилище “token → PendingData”:
-     *  - userId: ID нового пользователя
-     *  - username: логин (для удобства)
-     *  - rawPassword: сгенерированный пароль
-     */
-    private final Map<String, PendingData> pending = new ConcurrentHashMap<>();
 
     public GoogleOAuthService(UserRepository userRepository,
-                              PasswordEncoder passwordEncoder,
-                              TelegramService telegramService) {
+                              PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.telegramService = telegramService;
     }
 
     /**
@@ -106,18 +95,11 @@ public class GoogleOAuthService {
         // 4) Ищем существующего пользователя по email
         Optional<User> existing = userRepository.findByEmail(info.email());
         if (existing.isPresent()) {
-            // Уже был в БД → возвращаем его без “telegramToken”
-            return new OAuthResult(existing.get(), null);
+            return new OAuthResult(existing.get());
         }
 
-        // 5) Новый пользователь: создаём и возвращаем token для бота
         RegisteredUser created = registerUser(info, session);
-        String tokenToBot = storePending(
-                created.user().getId(),
-                created.user().getUsername(),
-                created.rawPassword()
-        );
-        return new OAuthResult(created.user(), tokenToBot);
+        return new OAuthResult(created.user());
     }
 
     /**
@@ -210,54 +192,7 @@ public class GoogleOAuthService {
         return new RegisteredUser(u, rawPassword);
     }
 
-    /**
-     * Вызывается из TelegramController:
-     * Когда бот получит /start?token=XYZ, и сообщит chatId и телефон →
-     * 1) Проверяем существующий PendingData по токену
-     * 2) Сохраняем в User поля phone и telegramChatId
-     * 3) Отправляем через TelegramService логин/пароль
-     */
-    public void completePhoneRegistration(String token, String phone, String chatId) {
-        PendingData data = pending.remove(token);
-        if (data == null) {
-            throw new IllegalArgumentException("Invalid token");
-        }
-
-        User user = userRepository.findById(data.userId())
-                .orElseThrow(() -> new IllegalStateException("User not found"));
-
-        user.setPhone(phone);
-        user.setTelegramChatId(chatId);
-        userRepository.save(user);
-
-        String msg = "Ваш логин: " + data.username() + "\nПароль: " + data.rawPassword();
-        telegramService.sendMessage(chatId, msg);
-    }
-
-    /**
-     * Сохраняет “token → (userId, username, rawPassword)” в локальную мапу и возвращает token.
-     */
-    private String storePending(long userId, String username, String rawPassword) {
-        String token = UUID.randomUUID().toString();
-        pending.put(token, new PendingData(userId, username, rawPassword));
-        return token;
-    }
-
-    /** Ищет в pending существующий токен по userId (на случай, если нужно вернуть ранее сгенерированный). */
-    private String findTokenByUserId(long userId) {
-        for (Map.Entry<String, PendingData> e : pending.entrySet()) {
-            if (e.getValue().userId() == userId) {
-                return e.getKey();
-            }
-        }
-        return null;
-    }
-
-    // === Вспомогательные record-классы ===
-
-    private record PendingData(long userId, String username, String rawPassword) {}
-
-    public record OAuthResult(User user, String token) {}
+    public record OAuthResult(User user) {}
 
     private record RegisteredUser(User user, String rawPassword) {}
 
