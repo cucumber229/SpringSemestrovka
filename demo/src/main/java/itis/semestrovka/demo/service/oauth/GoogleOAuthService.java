@@ -40,7 +40,7 @@ public class GoogleOAuthService {
     public String buildAuthorizationUrl(HttpSession session) {
         String state = UUID.randomUUID().toString();
         session.setAttribute("oauth2_state", state);
-        String base = "https:
+        String base = "https://accounts.google.com/o/oauth2/v2/auth";
         String url = base
                 + "?client_id=" + encode(clientId)
                 + "&redirect_uri=" + encode(redirectUri)
@@ -68,7 +68,7 @@ public class GoogleOAuthService {
     private String fetchAccessToken(String code) throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https:
+                .uri(URI.create("ttps://oauth2.googleapis.com/token"))
                 .header("Content-Type", "application/x-www-form-urlencoded")
                 .POST(ofFormData(Map.of(
                         "client_id", clientId,
@@ -88,7 +88,7 @@ public class GoogleOAuthService {
     private GoogleUserInfo fetchUserInfo(String accessToken) throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https:
+                .uri(URI.create("https://www.googleapis.com/oauth2/v2/userinfo"))
                 .header("Authorization", "Bearer " + accessToken)
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
