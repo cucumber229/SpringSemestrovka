@@ -34,6 +34,12 @@ public class GoogleOAuthController {
         UsernamePasswordAuthenticationToken auth =
                 new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
-        return "redirect:/projects";
+
+        // Если пользователь еще не привязал Telegram, покажем напоминание
+        String redirect = "/projects";
+        if (user.getTelegramChatId() == null) {
+            redirect += "?telegramPrompt";
+        }
+        return "redirect:" + redirect;
     }
 }
