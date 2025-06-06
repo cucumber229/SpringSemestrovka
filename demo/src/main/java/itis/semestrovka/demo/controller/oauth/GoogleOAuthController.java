@@ -36,15 +36,18 @@ public class GoogleOAuthController {
         GoogleOAuthService.OAuthResult result = googleOAuthService.processCallback(code, state, session);
 
         session.setAttribute("pendingUsername", result.user().getUsername());
-        if (session.getAttribute("pendingPassword") == null) {
+        if (session.getAttribute("pendingPassword") != null) {
             session.removeAttribute("pendingPassword");
         }
 
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                result.user(), result.user().getPassword(), result.user().getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(auth);
-        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
-                SecurityContextHolder.getContext());
+        UsernamePasswordAuthenticationToken auth =
+                UsernamePasswordAuthenticationToken.authenticated(
+                        result.user(), result.user().getPassword(), result.user().getAuthorities());
+        var context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(auth);
+        SecurityContextHolder.setContext(context);
+        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
+
 
         return "redirect:/projects";
 
