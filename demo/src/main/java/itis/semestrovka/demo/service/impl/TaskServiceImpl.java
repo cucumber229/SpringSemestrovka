@@ -4,6 +4,7 @@ package itis.semestrovka.demo.service.impl;
 import itis.semestrovka.demo.model.dto.TaskDto;
 import itis.semestrovka.demo.model.entity.Project;
 import itis.semestrovka.demo.model.entity.Task;
+import itis.semestrovka.demo.mapper.TaskConverter;
 import itis.semestrovka.demo.repository.TaskRepository;
 import itis.semestrovka.demo.repository.UserRepository;
 import itis.semestrovka.demo.service.TaskService;
@@ -57,11 +58,11 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public Task create(Project project, TaskDto dto) {
-        Task task = new Task();
+        // Преобразуем DTO в сущность с помощью конвертера
+        Task task = TaskConverter.toEntity(dto);
         task.setProject(project);
-        task.setTitle(dto.getTitle());
-        task.setStatus(dto.getStatus());
 
+        // Назначение пользователя осуществляется через репозиторий
         if (dto.getAssignedUsername() != null) {
             userRepo.findByUsername(dto.getAssignedUsername())
                     .ifPresent(task::setAssignedUser);
