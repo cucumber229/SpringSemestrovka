@@ -63,4 +63,15 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() ->
                         new UsernameNotFoundException("Пользователь " + username + " не найден"));
     }
+
+    @Override
+    public void updatePhone(User user, String phone) {
+        users.findByPhone(phone).ifPresent(u -> {
+            if (!u.getId().equals(user.getId())) {
+                throw new IllegalArgumentException("Телефон уже используется");
+            }
+        });
+        user.setPhone(phone);
+        users.save(user);
+    }
 }

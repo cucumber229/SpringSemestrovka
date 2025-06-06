@@ -34,6 +34,9 @@ public class GoogleOAuthController {
         UsernamePasswordAuthenticationToken auth =
                 new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
+        if (user.getPhone() != null && user.getPhone().startsWith("google-")) {
+            return "redirect:/oauth2/phone";
+        }
         return "redirect:/projects";
     }
 }
