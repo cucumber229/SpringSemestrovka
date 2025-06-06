@@ -5,4 +5,5 @@ package itis.semestrovka.demo.service.telegram;
  */
 public interface TelegramService {
     void sendMessage(String chatId, String text);
+
 }
