@@ -5,6 +5,7 @@ import itis.semestrovka.demo.model.dto.TaskDto;
 import itis.semestrovka.demo.model.entity.Project;
 import itis.semestrovka.demo.model.entity.Task;
 import itis.semestrovka.demo.repository.TaskRepository;
+import itis.semestrovka.demo.repository.UserRepository;
 import itis.semestrovka.demo.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.util.List;
 public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository repo;
+    private final UserRepository userRepo;
 
     /* ===== MVC ===== */
 
@@ -51,15 +53,25 @@ public class TaskServiceImpl implements TaskService {
         return repo.findAllByParticipants_Id(userId);
     }
 
-    /* ===== REST / AJAX (заглушки) ===== */
+    /* ===== REST / AJAX ===== */
 
     @Override
     public Task create(Project project, TaskDto dto) {
-        throw new UnsupportedOperationException("REST-метод пока не используется");
+        Task task = new Task();
+        task.setProject(project);
+        task.setTitle(dto.getTitle());
+        task.setStatus(dto.getStatus());
+
+        if (dto.getAssignedUsername() != null) {
+            userRepo.findByUsername(dto.getAssignedUsername())
+                    .ifPresent(task::setAssignedUser);
+        }
+
+        return repo.save(task);
     }
 
     @Override
     public void delete(Long projectId, Long taskId) {
-        throw new UnsupportedOperationException("REST-метод пока не используется");
+        repo.deleteByIdAndProjectId(taskId, projectId);
     }
 }
