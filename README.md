@@ -9,8 +9,9 @@ This project is a simple Spring Boot app used for managing teams and projects. I
    - `GOOGLE_CLIENT_ID` – Client ID from your Google Cloud OAuth consent screen.
    - `GOOGLE_CLIENT_SECRET` – Client secret for the same OAuth client.
    - `GOOGLE_REDIRECT_URI` (optional) – Defaults to `http://localhost:8080/oauth2/callback/google` and must match the allowed redirect URI in Google settings.
-   - `TELEGRAM_BOT_TOKEN` – Bot token obtained from @BotFather.
-   - `TELEGRAM_BOT_LINK` – Public link to your bot (e.g. `https://t.me/your_bot`).
+  - `TELEGRAM_BOT_TOKEN` – Bot token obtained from @BotFather.
+  - `TELEGRAM_BOT_LINK` – Public link to your bot. Defaults to `https://t.me/MyNotifierBot228bot`.
+
 
 3. Build and run using Maven:
 
@@ -20,8 +21,8 @@ cd demo
 ```
 
 After launch, open `http://localhost:8080/login` and use the "Войти через Google" button to authenticate via Google.
-After a successful Google login you will be asked to enter your phone number. The application will send this number to the Telegram bot so it can deliver your generated login and password.
+After a successful Google login you will be redirected to your Telegram bot where you must send your phone number. The bot will forward this phone to the application which stores it and sends your generated login and password back in Telegram.
 
+The bot opens using a special token so it knows which account to confirm. Once your phone is processed, the credentials are delivered and the phone is stored in the `users` table.
 
-If needed, the bot can link your chat by calling `/telegram/register?chatId=<yourChatId>` while you remain logged in. After registration the bot will send you the credentials stored during the Google sign in.
 

@@ -22,6 +22,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -42,6 +43,7 @@ public class GoogleOAuthService {
     private final PasswordEncoder passwordEncoder;
     private final TelegramService telegramService;
     private final ObjectMapper mapper = new ObjectMapper();
+    private final Map<String, PendingData> pending = new ConcurrentHashMap<>();
 
     public GoogleOAuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, TelegramService telegramService) {
         this.userRepository = userRepository;
@@ -61,7 +63,7 @@ public class GoogleOAuthService {
         return url;
     }
 
-    public User processCallback(String code, String state, HttpSession session) throws IOException, InterruptedException {
+    public OAuthResult processCallback(String code, String state, HttpSession session) throws IOException, InterruptedException {
         String savedState = (String) session.getAttribute("oauth2_state");
         session.removeAttribute("oauth2_state");
         if (savedState == null || !savedState.equals(state)) {
@@ -72,8 +74,12 @@ public class GoogleOAuthService {
         GoogleUserInfo info = fetchUserInfo(token);
 
         Optional<User> existing = userRepository.findByEmail(info.email());
-        User user = existing.orElseGet(() -> registerUser(info, session));
-        return user;
+        if (existing.isPresent()) {
+            return new OAuthResult(existing.get(), null);
+        }
+        RegisteredUser created = registerUser(info);
+        String tokenToBot = storePending(created.user().getId(), created.user().getUsername(), created.rawPassword());
+        return new OAuthResult(created.user(), tokenToBot);
     }
 
     private String fetchAccessToken(String code) throws IOException, InterruptedException {
@@ -115,7 +121,7 @@ public class GoogleOAuthService {
         );
     }
 
-    private User registerUser(GoogleUserInfo info, HttpSession session) {
+    private RegisteredUser registerUser(GoogleUserInfo info) {
         String baseUsername = info.name().replaceAll("\\s+", "").toLowerCase();
         if (baseUsername.isEmpty()) {
             baseUsername = info.email().split("@")[0];
@@ -145,7 +151,7 @@ public class GoogleOAuthService {
             telegramService.sendMessage(u.getTelegramChatId(), message);
         }
 
-        return u;
+        return new RegisteredUser(u, rawPassword);
     }
 
     private static String encode(String value) {
@@ -165,17 +171,34 @@ public class GoogleOAuthService {
 
     private record GoogleUserInfo(String id, String email, String name) {}
 
-    public void updatePhoneAndNotify(User user, String phone, HttpSession session) {
+    /**
+     * Complete registration using the token provided in the Telegram link.
+     * Updates the user's phone and Telegram chat id and sends credentials to the phone.
+     */
+    public void completePhoneRegistration(String token, String phone, String chatId) {
+        PendingData data = pending.remove(token);
+        if (data == null) {
+            throw new IllegalArgumentException("Invalid token");
+        }
+        User user = userRepository.findById(data.userId()).orElseThrow();
         user.setPhone(phone);
+        user.setTelegramChatId(chatId);
         userRepository.save(user);
 
-        String username = (String) session.getAttribute("pendingUsername");
-        String password = (String) session.getAttribute("pendingPassword");
-        if (username != null && password != null) {
-            String msg = "Ваш логин: " + username + "\nПароль: " + password;
-            telegramService.sendMessageToPhone(phone, msg);
-            session.removeAttribute("pendingUsername");
-            session.removeAttribute("pendingPassword");
-        }
+        String msg = "Ваш логин: " + data.username() + "\nПароль: " + data.rawPassword();
+        telegramService.sendMessageToPhone(phone, msg);
     }
+
+    private String storePending(long userId, String username, String rawPassword) {
+        String token = UUID.randomUUID().toString();
+        pending.put(token, new PendingData(userId, username, rawPassword));
+        return token;
+    }
+
+    private record PendingData(long userId, String username, String rawPassword) {}
+
+    public record OAuthResult(User user, String token) {}
+
+    private record RegisteredUser(User user, String rawPassword) {}
+
 }

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
+
 @Controller
 @RequestMapping("/oauth2")
 public class GoogleOAuthController {
@@ -35,28 +36,18 @@ public class GoogleOAuthController {
     @GetMapping("/callback/google")
     public String callback(@RequestParam String code,
                            @RequestParam String state,
-                           HttpSession session,
-                           Model model) throws Exception {
-        User user = googleOAuthService.processCallback(code, state, session);
+                           HttpSession session) throws Exception {
+        GoogleOAuthService.OAuthResult result = googleOAuthService.processCallback(code, state, session);
+        User user = result.user();
+
         UsernamePasswordAuthenticationToken auth =
                 new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
 
         if (user.getPhone() != null && user.getPhone().startsWith("google-")) {
-            return "auth/phone";
+            String token = result.token();
+            return "redirect:" + botLink + "?start=" + token;
         }
-        if (user.getTelegramChatId() == null) {
-            model.addAttribute("botLink", botLink);
-            return "telegram/redirect";
-        }
-        return "redirect:/projects";
-    }
-
-    @PostMapping("/phone")
-    public String submitPhone(@RequestParam String phone,
-                              @AuthenticationPrincipal User user,
-                              HttpSession session) {
-        googleOAuthService.updatePhoneAndNotify(user, phone, session);
         return "redirect:/projects";
 
     }
