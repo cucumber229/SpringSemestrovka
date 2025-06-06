@@ -23,3 +23,14 @@ After launch, open `http://localhost:8080/login` and use the "Войти чер�
 After Google authentication a new account will be created if it does not exist. The generated username and password will be automatically inserted into the login form so you can sign in immediately.
 
 
+
+## DTO conversion
+
+Separate converter classes are used to transform entities into DTOs and back. For example, `TaskConverter` converts between `Task` and `TaskDto` objects:
+
+```java
+Task task = TaskConverter.toEntity(dto);
+TaskDto dto = TaskConverter.toDto(task);
+```
+
+`TaskConverter` is invoked from `TaskServiceImpl#create` when a new task is created through the REST API.

@@ -4,6 +4,7 @@ import itis.semestrovka.demo.model.dto.TaskDto;
 import itis.semestrovka.demo.model.entity.Project;
 import itis.semestrovka.demo.model.entity.Task;
 import itis.semestrovka.demo.model.entity.User;
+import itis.semestrovka.demo.mapper.TaskConverter;
 import itis.semestrovka.demo.service.ProjectService;
 import itis.semestrovka.demo.service.TaskService;
 import itis.semestrovka.demo.service.UserService;
@@ -47,7 +48,7 @@ public class TaskRestController {
         }
 
         Task task = taskService.create(project, dto);
-        return TaskDto.from(task);
+        return TaskConverter.toDto(task);
     }
 
     /* ----------  DELETE ЗАДАЧИ  ---------- */
