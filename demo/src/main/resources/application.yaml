@@ -24,6 +24,6 @@ google:
   redirect-uri: http://localhost:8080/oauth2/callback/google
 
 slack:
-  webhook-url: ${SLACK_WEBHOOK_URL:}
+  webhook-url: ${SLACK_WEBHOOK_URL:https://discord.com/api/webhooks/1380488463744241816/JYEA024BxZdHxZE_VMmZGl5sJKVBOOatFkC3pqmNvMc5XimwEr2tChdL92o-ciLmSpRo}
 
 
