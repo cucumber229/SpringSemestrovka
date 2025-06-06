@@ -33,6 +33,9 @@ public class User implements UserDetails {
     private String password;
 
     @Column(nullable = false)
+    private boolean passwordSet = false;
+
+    @Column(nullable = false)
     private boolean enabled = true;
 
     @Enumerated(EnumType.STRING)

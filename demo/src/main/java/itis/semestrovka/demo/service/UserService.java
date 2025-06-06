@@ -21,4 +21,7 @@ public interface UserService extends UserDetailsService {
     /** Обновить номер телефона пользователя */
     void updatePhone(User user, String phone);
 
+    /** Установить или изменить пароль пользователя */
+    void updatePassword(User user, String password);
+
 }
