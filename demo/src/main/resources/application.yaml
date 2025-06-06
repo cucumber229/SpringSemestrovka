@@ -23,4 +23,7 @@ google:
   client-secret: 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
   redirect-uri: http://localhost:8080/oauth2/callback/google
 
+slack:
+  webhook-url: ${SLACK_WEBHOOK_URL:}
+
 
