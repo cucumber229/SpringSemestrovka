@@ -22,3 +22,8 @@ google:
   client-id: 73668923655-n0mnr5d63lph07s2leum9gdn4bug7i5a.apps.googleusercontent.com
   client-secret: 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
   redirect-uri: http://localhost:8080/oauth2/callback/google
+
+
+sms:
+  api-url: ${SMS_API_URL:https://sms.ru/sms/send}
+  api-id: ${SMS_API_ID:}
