@@ -23,8 +23,6 @@ import java.util.List;
 public class ProjectController {
 
     private final ProjectService projectService;
-    @Value("${telegram.bot-link:https://t.me/your_bot}")
-    private String botLink;
 
     public ProjectController(ProjectService projectService) {
         this.projectService = projectService;
@@ -43,7 +41,6 @@ public class ProjectController {
             @RequestParam(value = "type", required = false, defaultValue = "all") String type,
             @RequestParam(value = "sortField", required = false, defaultValue = "name") String sortField,
             @RequestParam(value = "sortDir", required = false, defaultValue = "asc") String sortDir,
-            @RequestParam(value = "telegramPrompt", required = false) String telegramPrompt,
             Model model,
             @AuthenticationPrincipal User currentUser
     ) {
@@ -119,8 +116,6 @@ public class ProjectController {
         // Для удобства переключения направления сортировки (при клике на заголовок)
         String reverseDir = sortDir.equalsIgnoreCase("asc") ? "desc" : "asc";
         model.addAttribute("reverseDir", reverseDir);
-        model.addAttribute("showTelegramPrompt", telegramPrompt != null);
-        model.addAttribute("botLink", botLink);
 
         return "project/list";
     }

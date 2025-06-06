@@ -3,9 +3,6 @@ package itis.semestrovka.demo.controller.oauth;
 import itis.semestrovka.demo.model.entity.User;
 import itis.semestrovka.demo.service.oauth.GoogleOAuthService;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,8 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class GoogleOAuthController {
 
     private final GoogleOAuthService googleOAuthService;
-    @Value("${telegram.bot-link:https://t.me/your_bot}")
-    private String botLink;
 
     public GoogleOAuthController(GoogleOAuthService googleOAuthService) {
         this.googleOAuthService = googleOAuthService;
@@ -36,16 +31,11 @@ public class GoogleOAuthController {
                            @RequestParam String state,
                            HttpSession session) throws Exception {
         GoogleOAuthService.OAuthResult result = googleOAuthService.processCallback(code, state, session);
-        User user = result.user();
-
-        UsernamePasswordAuthenticationToken auth =
-                new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(auth);
-
-        if (result.token() != null) {
-            session.setAttribute("telegramToken", result.token());
+        session.setAttribute("pendingUsername", result.user().getUsername());
+        if (session.getAttribute("pendingPassword") == null) {
+            session.removeAttribute("pendingPassword");
         }
-        return "redirect:/projects";
+        return "redirect:/login";
 
     }
 }
