@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/teams")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('ROLE_ADMIN')")
+@io.swagger.v3.oas.annotations.security.SecurityRequirement(name = "X-CSRF-TOKEN")
 public class TeamRestController {
 
     private final TeamService teamService;

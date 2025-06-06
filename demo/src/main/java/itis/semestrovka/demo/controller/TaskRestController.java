@@ -17,6 +17,7 @@ import java.security.Principal;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/projects/{projectId}/tasks")
+@io.swagger.v3.oas.annotations.security.SecurityRequirement(name = "X-CSRF-TOKEN")
 public class TaskRestController {
 
     private final TaskService     taskService;
