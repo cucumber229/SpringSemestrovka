@@ -9,6 +9,7 @@ import itis.semestrovka.demo.service.ProjectService;
 import itis.semestrovka.demo.service.TaskService;
 import itis.semestrovka.demo.service.UserService;
 import itis.semestrovka.demo.service.CommentService;
+import itis.semestrovka.demo.service.SlackService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -33,6 +34,7 @@ public class TaskController {
     private final ProjectService projectService;
     private final UserService    userService;   // ← добавили
     private final CommentService commentService;
+    private final SlackService slackService;
 
     /* ----------  ФОРМА СОЗДАНИЯ  ---------- */
     @GetMapping("/new")
@@ -109,6 +111,8 @@ public class TaskController {
         task.setParticipants(participants);
 
         taskService.save(task);
+        slackService.sendTaskCreatedNotification(
+                project.getName(), task.getTitle(), currentUser.getUsername());
         return "redirect:/projects/" + projectId + "/view";
     }
 
