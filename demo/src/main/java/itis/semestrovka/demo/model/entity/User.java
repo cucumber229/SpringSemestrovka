@@ -35,8 +35,6 @@ public class User implements UserDetails {
     @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean passwordSet = false;
 
-    @Column(nullable = false)
-    private boolean passwordSet = false;
 
     @Column(nullable = false)
     private boolean enabled = true;
