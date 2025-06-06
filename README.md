@@ -12,6 +12,7 @@ This project is a simple Spring Boot app used for managing teams and projects. I
   - `TELEGRAM_BOT_TOKEN` – Bot token obtained from @BotFather.
   - `TELEGRAM_BOT_LINK` – Public link to your bot. Defaults to `https://t.me/MyNotifierBot228bot`.
 
+
 3. Build and run using Maven:
 
 ```bash
@@ -23,4 +24,5 @@ After launch, open `http://localhost:8080/login` and use the "Войти чер�
 After a successful Google login you will be redirected to your Telegram bot where you must send your phone number. The bot will forward this phone to the application which stores it and sends your generated login and password back in Telegram.
 
 The bot opens using a special token so it knows which account to confirm. Once your phone is processed, the credentials are delivered and the phone is stored in the `users` table.
+
 

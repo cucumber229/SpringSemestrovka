@@ -4,6 +4,7 @@ import itis.semestrovka.demo.model.entity.User;
 import itis.semestrovka.demo.service.UserService;
 import itis.semestrovka.demo.service.telegram.TelegramService;
 import itis.semestrovka.demo.service.oauth.GoogleOAuthService;
+
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,12 +23,24 @@ public class TelegramController {
         this.userService = userService;
         this.telegramService = telegramService;
         this.googleOAuthService = googleOAuthService;
+
     }
 
     @GetMapping("/register")
     public String register(@RequestParam String chatId,
-                           @AuthenticationPrincipal User user) {
+                           @AuthenticationPrincipal User user,
+                           HttpSession session) {
         userService.updateTelegramChatId(user, chatId);
+
+        String username = (String) session.getAttribute("pendingUsername");
+        String password = (String) session.getAttribute("pendingPassword");
+        if (username != null && password != null) {
+            String msg = "Ваш логин: " + username + "\nПароль: " + password;
+            telegramService.sendMessage(chatId, msg);
+            session.removeAttribute("pendingUsername");
+            session.removeAttribute("pendingPassword");
+        }
+
         return "ok";
     }
 

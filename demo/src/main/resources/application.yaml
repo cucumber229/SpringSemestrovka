@@ -28,3 +28,4 @@ telegram:
   bot-token: ${TELEGRAM_BOT_TOKEN:7995355623:AAFZ1JZBOKR66n2IyHAIlVESM7ye_5Dqgcs}
   bot-link: ${TELEGRAM_BOT_LINK:https://t.me/MyNotifierBot228bot}
 
+

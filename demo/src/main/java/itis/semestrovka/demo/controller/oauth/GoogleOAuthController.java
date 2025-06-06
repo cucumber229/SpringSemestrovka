@@ -7,9 +7,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 
 @Controller
@@ -36,6 +39,7 @@ public class GoogleOAuthController {
                            HttpSession session) throws Exception {
         GoogleOAuthService.OAuthResult result = googleOAuthService.processCallback(code, state, session);
         User user = result.user();
+
         UsernamePasswordAuthenticationToken auth =
                 new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
@@ -45,5 +49,6 @@ public class GoogleOAuthController {
             return "redirect:" + botLink + "?start=" + token;
         }
         return "redirect:/projects";
+
     }
 }
