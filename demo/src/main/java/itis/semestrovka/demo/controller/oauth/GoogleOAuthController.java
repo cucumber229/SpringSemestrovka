@@ -9,8 +9,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 @Controller
 @RequestMapping("/oauth2")
@@ -40,11 +42,22 @@ public class GoogleOAuthController {
                 new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
 
+        if (user.getPhone() != null && user.getPhone().startsWith("google-")) {
+            return "auth/phone";
+        }
         if (user.getTelegramChatId() == null) {
             model.addAttribute("botLink", botLink);
             return "telegram/redirect";
-
         }
         return "redirect:/projects";
+    }
+
+    @PostMapping("/phone")
+    public String submitPhone(@RequestParam String phone,
+                              @AuthenticationPrincipal User user,
+                              HttpSession session) {
+        googleOAuthService.updatePhoneAndNotify(user, phone, session);
+        return "redirect:/projects";
+
     }
 }

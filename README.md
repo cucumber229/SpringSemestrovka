@@ -20,7 +20,8 @@ cd demo
 ```
 
 After launch, open `http://localhost:8080/login` and use the "Войти через Google" button to authenticate via Google.
-After a successful Google login you will be redirected to your Telegram bot so it can deliver your generated login and password.
+After a successful Google login you will be asked to enter your phone number. The application will send this number to the Telegram bot so it can deliver your generated login and password.
+
 
 If needed, the bot can link your chat by calling `/telegram/register?chatId=<yourChatId>` while you remain logged in. After registration the bot will send you the credentials stored during the Google sign in.
 

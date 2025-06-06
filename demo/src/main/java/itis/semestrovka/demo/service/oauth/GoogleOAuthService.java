@@ -164,4 +164,18 @@ public class GoogleOAuthService {
     }
 
     private record GoogleUserInfo(String id, String email, String name) {}
+
+    public void updatePhoneAndNotify(User user, String phone, HttpSession session) {
+        user.setPhone(phone);
+        userRepository.save(user);
+
+        String username = (String) session.getAttribute("pendingUsername");
+        String password = (String) session.getAttribute("pendingPassword");
+        if (username != null && password != null) {
+            String msg = "Ваш логин: " + username + "\nПароль: " + password;
+            telegramService.sendMessageToPhone(phone, msg);
+            session.removeAttribute("pendingUsername");
+            session.removeAttribute("pendingPassword");
+        }
+    }
 }
