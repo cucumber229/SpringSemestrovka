@@ -57,7 +57,7 @@
 
 
           <!-- Исполнители (можно выбрать несколько) -->
-          <div class="mb-3" th:if="${#lists.size(candidates) > 1}">
+          <div class="mb-3" th:if="${#lists.size(candidates) > 0}">
             <label for="participantIds" class="form-label">Исполнители</label>
           <select id="participantIds" name="participantIds" multiple class="form-select">
             <option th:each="u : ${candidates}"

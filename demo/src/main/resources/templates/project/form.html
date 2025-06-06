@@ -72,7 +72,7 @@
           </div>
 
           <!-- Тип проекта -->
-          <div class="mb-3" th:if="${hasTeam}">
+          <div class="mb-3" th:if="${hasTeam || project.team != null}">
             <label class="form-label">Тип проекта</label>
             <div class="form-check">
               <input class="form-check-input"
