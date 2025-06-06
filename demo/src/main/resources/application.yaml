@@ -24,6 +24,7 @@ google:
   redirect-uri: http://localhost:8080/oauth2/callback/google
 
 
-sms:
-  api-url: ${SMS_API_URL:https://sms.ru/sms/send}
-  api-id: ${SMS_API_ID:}
+email:
+  api-url: ${EMAIL_API_URL:https://api.unisender.com/ru/api/sendEmail}
+  api-key: ${EMAIL_API_KEY:}
+  from: ${EMAIL_FROM:no-reply@example.com}
