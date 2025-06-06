@@ -74,4 +74,10 @@ public class UserServiceImpl implements UserService {
         user.setPhone(phone);
         users.save(user);
     }
+
+    @Override
+    public void updateTelegramChatId(User user, String chatId) {
+        user.setTelegramChatId(chatId);
+        users.save(user);
+    }
 }

@@ -9,8 +9,7 @@ This project is a simple Spring Boot app used for managing teams and projects. I
    - `GOOGLE_CLIENT_ID` – Client ID from your Google Cloud OAuth consent screen.
    - `GOOGLE_CLIENT_SECRET` – Client secret for the same OAuth client.
    - `GOOGLE_REDIRECT_URI` (optional) – Defaults to `http://localhost:8080/oauth2/callback/google` and must match the allowed redirect URI in Google settings.
-   - `SMS_API_ID` – API key for sms.ru or another SMS provider.
-   - `SMS_API_URL` (optional) – Endpoint for sending SMS, defaults to `https://sms.ru/sms/send`.
+   - `TELEGRAM_BOT_TOKEN` – Bot token obtained from @BotFather.
 3. Build and run using Maven:
 
 ```bash
@@ -19,4 +18,7 @@ cd demo
 ```
 
 After launch, open `http://localhost:8080/login` and use the "Войти через Google" button to authenticate via Google.
+
+To link your Telegram account, send `/start` to your bot and make it call
+`/telegram/register?chatId=<yourChatId>` while you are logged in.
 

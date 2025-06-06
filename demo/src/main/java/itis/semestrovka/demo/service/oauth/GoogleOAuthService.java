@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import itis.semestrovka.demo.model.entity.Role;
 import itis.semestrovka.demo.model.entity.User;
 import itis.semestrovka.demo.repository.UserRepository;
+import itis.semestrovka.demo.service.telegram.TelegramService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -38,11 +39,13 @@ public class GoogleOAuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final TelegramService telegramService;
     private final ObjectMapper mapper = new ObjectMapper();
 
-    public GoogleOAuthService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public GoogleOAuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, TelegramService telegramService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.telegramService = telegramService;
     }
 
     public String buildAuthorizationUrl(HttpSession session) {
@@ -126,9 +129,14 @@ public class GoogleOAuthService {
         u.setPhone("google-" + info.id());
         String rawPassword = UUID.randomUUID().toString();
         u.setPassword(passwordEncoder.encode(rawPassword));
-        session.setAttribute("oauth_password", rawPassword);
         u.setRole(Role.ROLE_USER);
-        return userRepository.save(u);
+        u = userRepository.save(u);
+
+        String message = "Ваш логин: " + username + "\nПароль: " + rawPassword;
+        if (u.getTelegramChatId() != null) {
+            telegramService.sendMessage(u.getTelegramChatId(), message);
+        }
+        return u;
     }
 
     private static String encode(String value) {
