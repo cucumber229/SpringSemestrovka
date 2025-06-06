@@ -35,17 +35,7 @@ public class TaskRestController {
                           Principal principal) {
 
         Project project = projectService.findById(projectId);
-
-        // доступ только владельцу проекта или ADMIN
-        boolean allowed =
-                principal.getName().equals(project.getOwner().getUsername()) ||
-                        SecurityContextHolder.getContext().getAuthentication()
-                                .getAuthorities().stream()
-                                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-
-        if (!allowed) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-        }
+        checkOwnerOrAdmin(principal.getName(), project.getOwner().getUsername());
 
         Task task = taskService.create(project, dto);
         return TaskConverter.toDto(task);
@@ -60,16 +50,7 @@ public class TaskRestController {
                        Principal principal) {
 
         Project project = projectService.findById(projectId);
-
-        boolean allowed =
-                principal.getName().equals(project.getOwner().getUsername()) ||
-                        SecurityContextHolder.getContext().getAuthentication()
-                                .getAuthorities().stream()
-                                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-
-        if (!allowed) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-        }
+        checkOwnerOrAdmin(principal.getName(), project.getOwner().getUsername());
 
         taskService.delete(projectId, taskId);
     }
@@ -85,22 +66,10 @@ public class TaskRestController {
 
         Project project = projectService.findById(projectId);
         Task task = taskService.findById(taskId);
+        checkOwnerOrAdmin(principal.getName(), project.getOwner().getUsername());
 
-        // Только владелец проекта или ADMIN могут добавлять участника
-        boolean allowed =
-                principal.getName().equals(project.getOwner().getUsername()) ||
-                        SecurityContextHolder.getContext().getAuthentication()
-                                .getAuthorities().stream()
-                                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-
-        if (!allowed) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-        }
-
-        // Найдём пользователя по userId
         User user = userService.findById(userId);
 
-        // Проверим, что пользователь входит в команду проекта (если команда существует)
         if (project.getTeam() != null) {
             boolean isInTeam = project.getTeam().getMembers().stream()
                     .anyMatch(u -> u.getId().equals(userId));
@@ -108,20 +77,15 @@ public class TaskRestController {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                         "Пользователь не входит в команду проекта");
             }
-        } else {
-            // Если у проекта нет команды, единственный допустимый участник — это владелец
-            if (!project.getOwner().getId().equals(userId)) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "У проекта нет команды — можно добавить только владельца");
-            }
+        } else if (!project.getOwner().getId().equals(userId)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "У проекта нет команды — можно добавить только владельца");
         }
 
-        // Добавим в список участников, если ещё не добавлен
         if (task.getParticipants().stream().noneMatch(u -> u.getId().equals(userId))) {
             task.getParticipants().add(user);
             taskService.save(task);
         }
-        // Если уже был участником, просто возвращаем 204 без ошибок
     }
 
     /* ----------  REMOVE PARTICIPANT (удалить участника)  ---------- */
@@ -135,23 +99,21 @@ public class TaskRestController {
 
         Project project = projectService.findById(projectId);
         Task task = taskService.findById(taskId);
+        checkOwnerOrAdmin(principal.getName(), project.getOwner().getUsername());
 
-        // Только владелец проекта или ADMIN могут удалять участника
-        boolean allowed =
-                principal.getName().equals(project.getOwner().getUsername()) ||
-                        SecurityContextHolder.getContext().getAuthentication()
-                                .getAuthorities().stream()
-                                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-
-        if (!allowed) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-        }
-
-        // Если у задачи нет такого участника, просто ничего не делаем
         boolean wasParticipant = task.getParticipants().removeIf(u -> u.getId().equals(userId));
         if (wasParticipant) {
             taskService.save(task);
         }
-        // Если участник отсутствовал, всё равно возвращаем 204
+    }
+
+    /** Проверка: текущий пользователь — владелец проекта или админ */
+    private void checkOwnerOrAdmin(String username, String ownerUsername) {
+        boolean isAdmin = SecurityContextHolder.getContext().getAuthentication()
+                .getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        if (!username.equals(ownerUsername) && !isAdmin) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
     }
 }
