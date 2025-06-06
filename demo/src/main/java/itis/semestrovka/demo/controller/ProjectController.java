@@ -40,6 +40,7 @@ public class ProjectController {
             @RequestParam(value = "type", required = false, defaultValue = "all") String type,
             @RequestParam(value = "sortField", required = false, defaultValue = "name") String sortField,
             @RequestParam(value = "sortDir", required = false, defaultValue = "asc") String sortDir,
+            @RequestParam(value = "telegramPrompt", required = false) String telegramPrompt,
             Model model,
             @AuthenticationPrincipal User currentUser
     ) {
@@ -115,6 +116,7 @@ public class ProjectController {
         // Для удобства переключения направления сортировки (при клике на заголовок)
         String reverseDir = sortDir.equalsIgnoreCase("asc") ? "desc" : "asc";
         model.addAttribute("reverseDir", reverseDir);
+        model.addAttribute("showTelegramPrompt", telegramPrompt != null);
 
         return "project/list";
     }

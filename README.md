@@ -19,7 +19,7 @@ cd demo
 ```
 
 After launch, open `http://localhost:8080/login` and use the "Войти через Google" button to authenticate via Google.
+After a successful Google login you will be redirected to the projects page. If you haven't linked Telegram yet you will see a reminder asking to open the bot.
 
-To link your Telegram account, send `/start` to your bot and make it call
-`/telegram/register?chatId=<yourChatId>` while you are logged in.
+To link your Telegram account, send `/start` to your bot and make it call `/telegram/register?chatId=<yourChatId>` while you are logged in. Once linked, the bot will send you your generated login and password.
 
