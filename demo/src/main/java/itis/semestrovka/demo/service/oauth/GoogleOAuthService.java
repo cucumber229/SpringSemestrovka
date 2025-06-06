@@ -134,6 +134,11 @@ public class GoogleOAuthService {
         u.setRole(Role.ROLE_USER);
         u = userRepository.save(u);
 
+        // remember credentials in the HTTP session so they can be sent
+        // after the user links Telegram
+        session.setAttribute("pendingUsername", username);
+        session.setAttribute("pendingPassword", rawPassword);
+
 
         String message = "Ваш логин: " + username + "\nПароль: " + rawPassword;
         if (u.getTelegramChatId() != null) {
@@ -159,4 +164,18 @@ public class GoogleOAuthService {
     }
 
     private record GoogleUserInfo(String id, String email, String name) {}
+
+    public void updatePhoneAndNotify(User user, String phone, HttpSession session) {
+        user.setPhone(phone);
+        userRepository.save(user);
+
+        String username = (String) session.getAttribute("pendingUsername");
+        String password = (String) session.getAttribute("pendingPassword");
+        if (username != null && password != null) {
+            String msg = "Ваш логин: " + username + "\nПароль: " + password;
+            telegramService.sendMessageToPhone(phone, msg);
+            session.removeAttribute("pendingUsername");
+            session.removeAttribute("pendingPassword");
+        }
+    }
 }
