@@ -55,6 +55,34 @@
                 </div>
               </div>
 
+              <!-- Поле «Email» -->
+              <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email"
+                       id="email"
+                       th:field="*{email}"
+                       placeholder="Введите email"
+                       required>
+                <div th:if="${#fields.hasErrors('email')}"
+                     th:errors="*{email}"
+                       class="text-danger">
+                </div>
+              </div>
+
+              <!-- Поле «Телефон» -->
+              <div class="form-group">
+                <label for="phone">Телефон</label>
+                <input type="text"
+                       id="phone"
+                       th:field="*{phone}"
+                       placeholder="Введите телефон"
+                       required>
+                <div th:if="${#fields.hasErrors('phone')}"
+                     th:errors="*{phone}"
+                       class="text-danger">
+                </div>
+              </div>
+
               <!-- Кнопка «Зарегистрироваться» -->
                 <button type="submit" class="btn btn-primary w-100">Зарегистрироваться</button>
             </form>
