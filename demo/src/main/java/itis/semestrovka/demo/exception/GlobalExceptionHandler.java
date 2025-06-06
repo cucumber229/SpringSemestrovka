@@ -3,6 +3,7 @@ package itis.semestrovka.demo.exception;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -20,13 +21,16 @@ public class GlobalExceptionHandler {
         return request.getRequestURI().startsWith("/api");
     }
 
-    private Object buildResponse(HttpStatus status, String message, HttpServletRequest request) {
+    private Object buildResponse(HttpStatusCode status, String message, HttpServletRequest request) {
         if (isApiRequest(request)) {
             ErrorResponse body = new ErrorResponse(status.value(), message);
-            return new ResponseEntity<>(body, status);
+            return ResponseEntity.status(status.value()).body(body);
         }
         ModelAndView mav = new ModelAndView("error");
-        mav.setStatus(status);
+        HttpStatus httpStatus = HttpStatus.resolve(status.value());
+        if (httpStatus != null) {
+            mav.setStatus(httpStatus);
+        }
         mav.addObject("error", message);
         return mav;
     }
