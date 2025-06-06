@@ -17,4 +17,7 @@ public interface UserService extends UserDetailsService {
 
     /** Найти пользователя по id (или бросить исключение) */
     User findById(Long id);
+
+    /** Обновить номер телефона пользователя */
+    void updatePhone(User user, String phone);
 }

@@ -67,7 +67,7 @@ public class GoogleOAuthService {
         GoogleUserInfo info = fetchUserInfo(token);
 
         Optional<User> existing = userRepository.findByEmail(info.email());
-        User user = existing.orElseGet(() -> registerUser(info));
+        User user = existing.orElseGet(() -> registerUser(info, session));
         return user;
     }
 
@@ -110,7 +110,7 @@ public class GoogleOAuthService {
         );
     }
 
-    private User registerUser(GoogleUserInfo info) {
+    private User registerUser(GoogleUserInfo info, HttpSession session) {
         String baseUsername = info.name().replaceAll("\\s+", "").toLowerCase();
         if (baseUsername.isEmpty()) {
             baseUsername = info.email().split("@")[0];
@@ -124,7 +124,9 @@ public class GoogleOAuthService {
         u.setUsername(username);
         u.setEmail(info.email());
         u.setPhone("google-" + info.id());
-        u.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
+        String rawPassword = UUID.randomUUID().toString();
+        u.setPassword(passwordEncoder.encode(rawPassword));
+        session.setAttribute("oauth_password", rawPassword);
         u.setRole(Role.ROLE_USER);
         return userRepository.save(u);
     }
