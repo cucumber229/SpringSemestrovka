@@ -40,8 +40,11 @@ public class TeamServiceImpl implements TeamService {
     public void removeUserFromTeam(Long teamId, Long userId) {
         Team team = teamRepo.findById(teamId).orElseThrow();
         User user = userRepo.findById(userId).orElseThrow();
-        if (!team.equals(user.getTeam()))
+            Team userTeam = user.getTeam();
+        if (userTeam == null || !userTeam.getId().equals(team.getId())) {
             throw new IllegalStateException("Пользователь не состоит в этой команде");
+        }
+
         user.setTeam(null);
         userRepo.save(user);
     }
