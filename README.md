@@ -11,6 +11,8 @@ This project is a simple Spring Boot app used for managing teams and projects. I
    - `GOOGLE_REDIRECT_URI` (optional) – Defaults to `http://localhost:8080/oauth2/callback/google` and must match the allowed redirect URI in Google settings.
    - `SLACK_WEBHOOK_URL` (optional) – Incoming webhook for Slack notifications.
 
+   The `application.yaml` file reads `google.client-id` and `google.client-secret` from these variables, so the application will fail to start if they are not defined.
+
 
 3. Build and run using Maven:
 
