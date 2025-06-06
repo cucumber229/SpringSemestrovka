@@ -8,11 +8,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 
 @Controller
@@ -33,22 +33,35 @@ public class GoogleOAuthController {
         return "redirect:" + url;
     }
 
+
     @GetMapping("/callback/google")
     public String callback(@RequestParam String code,
                            @RequestParam String state,
-                           HttpSession session) throws Exception {
-        GoogleOAuthService.OAuthResult result = googleOAuthService.processCallback(code, state, session);
-        User user = result.user();
+                           HttpSession session,
+                           Model model) throws Exception {
+        User user = googleOAuthService.processCallback(code, state, session);
 
         UsernamePasswordAuthenticationToken auth =
                 new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
 
         if (user.getPhone() != null && user.getPhone().startsWith("google-")) {
-            String token = result.token();
-            return "redirect:" + botLink + "?start=" + token;
+            return "auth/phone";
+        }
+        if (user.getTelegramChatId() == null) {
+            model.addAttribute("botLink", botLink);
+            return "telegram/redirect";
         }
         return "redirect:/projects";
+    }
 
+    @PostMapping("/phone")
+    public String submitPhone(@RequestParam String phone,
+                              @AuthenticationPrincipal User user,
+                              HttpSession session,
+                              Model model) {
+        googleOAuthService.savePhone(user, phone, session);
+        model.addAttribute("botLink", botLink);
+        return "telegram/redirect";
     }
 }
