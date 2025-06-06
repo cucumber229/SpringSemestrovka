@@ -43,6 +43,7 @@ public class GoogleOAuthController {
         if (user.getTelegramChatId() == null) {
             model.addAttribute("botLink", botLink);
             return "telegram/redirect";
+
         }
         return "redirect:/projects";
     }
