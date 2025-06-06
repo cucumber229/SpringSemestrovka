@@ -4,12 +4,14 @@ spring:
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
+
   thymeleaf:
     cache: false
     mode: HTML
     prefix: classpath:/templates/
     suffix: .html
     check-template-location: true
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -24,13 +26,10 @@ google:
   redirect-uri: http://localhost:8080/oauth2/callback/google
 
 slack:
-
   webhook-url: ${SLACK_WEBHOOK_URL:https://discord.com/api/webhooks/1380488463744241816/JYEA024BxZdHxZE_VMmZGl5sJKVBOOatFkC3pqmNvMc5XimwEr2tChdL92o-ciLmSpRo}
 
-
-
-
+# Отключаем показ «default»-группы в Swagger UI (чтобы не было лишних MVC-эндпоинтов)
 springdoc:
+  show-default-group: false
   swagger-ui:
     path: /swagger-ui.html
-
