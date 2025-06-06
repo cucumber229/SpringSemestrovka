@@ -24,12 +24,9 @@ public class PasswordController {
     @GetMapping
     public String form(@AuthenticationPrincipal User currentUser, Model model) {
         model.addAttribute("title", "Установить пароль");
-        if (!currentUser.getPhone().startsWith("google-")) {
-            model.addAttribute("alreadySet", true);
-            return "auth/set_password";
-        }
-        if (currentUser.isPasswordSet()) {
-            model.addAttribute("alreadySet", true);
+        boolean alreadySet = !currentUser.getPhone().startsWith("google-") || currentUser.isPasswordSet();
+        model.addAttribute("alreadySet", alreadySet);
+        if (alreadySet) {
             return "auth/set_password";
         }
         model.addAttribute("form", new PasswordForm());
@@ -42,8 +39,9 @@ public class PasswordController {
                        @AuthenticationPrincipal User currentUser,
                        Model model) {
         model.addAttribute("title", "Установить пароль");
-        if (!currentUser.getPhone().startsWith("google-") || currentUser.isPasswordSet()) {
-            model.addAttribute("alreadySet", true);
+        boolean alreadySet = !currentUser.getPhone().startsWith("google-") || currentUser.isPasswordSet();
+        model.addAttribute("alreadySet", alreadySet);
+        if (alreadySet) {
             return "auth/set_password";
         }
         if (br.hasErrors()) {
