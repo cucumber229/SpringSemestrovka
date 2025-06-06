@@ -10,7 +10,6 @@ spring:
     prefix: classpath:/templates/
     suffix: .html
     check-template-location: true
-
   jpa:
     hibernate:
       ddl-auto: update
@@ -20,6 +19,6 @@ spring:
         format_sql: true
 
 google:
-  client-id: ${GOOGLE_CLIENT_ID:}
-  client-secret: ${GOOGLE_CLIENT_SECRET:}
-  redirect-uri: ${GOOGLE_REDIRECT_URI:http://localhost:8080/oauth2/callback/google}
+  client-id: 73668923655-n0mnr5d63lph07s2leum9gdn4bug7i5a.apps.googleusercontent.com
+  client-secret: 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
+  redirect-uri: http://localhost:8080/oauth2/callback/google
