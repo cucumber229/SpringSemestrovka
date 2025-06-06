@@ -58,5 +58,6 @@ public class GoogleOAuthController {
                               HttpSession session) {
         googleOAuthService.updatePhoneAndNotify(user, phone, session);
         return "redirect:/projects";
+
     }
 }
