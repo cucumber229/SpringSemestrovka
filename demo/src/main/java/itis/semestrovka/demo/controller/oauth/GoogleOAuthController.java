@@ -3,6 +3,7 @@ package itis.semestrovka.demo.controller.oauth;
 import itis.semestrovka.demo.model.entity.User;
 import itis.semestrovka.demo.service.oauth.GoogleOAuthService;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class GoogleOAuthController {
 
     private final GoogleOAuthService googleOAuthService;
+    @Value("${telegram.bot-link:https://t.me/your_bot}")
+    private String botLink;
 
     public GoogleOAuthController(GoogleOAuthService googleOAuthService) {
         this.googleOAuthService = googleOAuthService;
@@ -35,11 +38,9 @@ public class GoogleOAuthController {
                 new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
 
-        // Если пользователь еще не привязал Telegram, покажем напоминание
-        String redirect = "/projects";
         if (user.getTelegramChatId() == null) {
-            redirect += "?telegramPrompt";
+            return "redirect:" + botLink;
         }
-        return "redirect:" + redirect;
+        return "redirect:/projects";
     }
 }
