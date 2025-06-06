@@ -14,5 +14,6 @@ public class ChangePasswordForm {
     private String newPassword;
 
     @NotBlank(message = "Повторите новый пароль")
+
     private String confirmPassword;
 }
