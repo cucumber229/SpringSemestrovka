@@ -9,19 +9,20 @@ import lombok.Data;
 
 @Data
 public class RegistrationForm {
-    @NotBlank
-    @Size(min = 4, max = 20)
+    @NotBlank(message = "Имя обязательно")
+    @Size(min = 4, max = 20, message = "Имя должно быть от 4 до 20 символов")
     private String username;
 
-    @NotBlank
-    @Size(min = 6)
+    @NotBlank(message = "Пароль обязателен")
+    @Size(min = 8, message = "Пароль должен быть не менее 8 символов")
     private String password;
 
-    @NotBlank
-    @Email
+    @NotBlank(message = "Email обязателен")
+    @Email(message = "Неверный формат email")
     private String email;
 
-    @NotBlank
-    @Pattern(regexp = "\\+?\\d{10,15}", message = "Некорректный телефон")
+    @NotBlank(message = "Телефон обязателен")
+    @Pattern(regexp = "(8|\\+7)\\d{10}", message = "Телефон должен быть в формате +7XXXXXXXXXX или 8XXXXXXXXXX")
     private String phone;
+
 }
