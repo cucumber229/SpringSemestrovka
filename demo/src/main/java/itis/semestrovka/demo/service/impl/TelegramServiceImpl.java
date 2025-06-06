@@ -36,6 +36,11 @@ public class TelegramServiceImpl implements TelegramService {
         }
     }
 
+    @Override
+    public void sendMessageToPhone(String phone, String text) {
+        sendMessage(phone, text);
+    }
+
     private static String encode(String value) {
         return URLEncoder.encode(value, StandardCharsets.UTF_8);
     }
