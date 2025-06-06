@@ -134,6 +134,11 @@ public class GoogleOAuthService {
         u.setRole(Role.ROLE_USER);
         u = userRepository.save(u);
 
+        // remember credentials in the HTTP session so they can be sent
+        // after the user links Telegram
+        session.setAttribute("pendingUsername", username);
+        session.setAttribute("pendingPassword", rawPassword);
+
 
         String message = "Ваш логин: " + username + "\nПароль: " + rawPassword;
         if (u.getTelegramChatId() != null) {
