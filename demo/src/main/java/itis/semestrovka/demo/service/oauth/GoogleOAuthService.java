@@ -1,3 +1,5 @@
+// src/main/java/itis/semestrovka/demo/service/oauth/GoogleOAuthService.java
+
 package itis.semestrovka.demo.service.oauth;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -42,7 +44,12 @@ public class GoogleOAuthService {
     private final TelegramService telegramService;
     private final ObjectMapper mapper = new ObjectMapper();
 
-    // Хранилище токена → (userId, username, rawPassword)
+    /**
+     * Локальное хранилище “token → PendingData”:
+     *  - userId: ID нового пользователя
+     *  - username: логин (для удобства)
+     *  - rawPassword: сгенерированный пароль
+     */
     private final Map<String, PendingData> pending = new ConcurrentHashMap<>();
 
     public GoogleOAuthService(UserRepository userRepository,
@@ -54,7 +61,7 @@ public class GoogleOAuthService {
     }
 
     /**
-     * Составляем URL для авторизации через Google и сохраняем state в сессии.
+     * Формирует URL для перенаправления на Google OAuth, сохраняет state в сессии.
      */
     public String buildAuthorizationUrl(HttpSession session) {
         String state = UUID.randomUUID().toString();
@@ -72,41 +79,50 @@ public class GoogleOAuthService {
     }
 
     /**
-     * Обрабатываем коллбэк от Google: получаем токен, инфо о пользователе, сохраняем/обновляем запись в базе.
-     * Если пользователь новый, создаём его, генерируем временный пароль и сохраняем его в сессии/Map для передачи в Telegram.
+     * Обрабатывает callback от Google:
+     * 1) Валидирует state из сессии.
+     * 2) Меняет code → access_token.
+     * 3) Запрашивает userinfo у Google.
+     * 4) Если пользователь с таким email уже есть в базе — возвращает его (без токена).
+     * 5) Иначе создаёт нового пользователя, генерирует rawPassword, сохраняет его в БД,
+     *    запоминает rawPassword в сессии и выдаёт токен, который пригодится Telegram-боту.
      */
     public OAuthResult processCallback(String code, String state, HttpSession session)
             throws IOException, InterruptedException {
 
+        // 1) Проверка state
         String savedState = (String) session.getAttribute("oauth2_state");
         session.removeAttribute("oauth2_state");
         if (savedState == null || !savedState.equals(state)) {
             throw new IllegalStateException("Invalid state");
         }
 
-        // Запрашиваем access_token
+        // 2) Получаем access_token
         String accessToken = fetchAccessToken(code);
 
-        // Получаем информацию о пользователе
+        // 3) Запрашиваем у Google информацию о пользователе
         GoogleUserInfo info = fetchUserInfo(accessToken);
 
-        // Проверяем, существует ли пользователь с таким email
+        // 4) Ищем существующего пользователя по email
         Optional<User> existing = userRepository.findByEmail(info.email());
         if (existing.isPresent()) {
-            // Уже зарегистрирован → возвращаем существующего без токена
+            // Уже был в БД → возвращаем его без “telegramToken”
             return new OAuthResult(existing.get(), null);
         }
 
-        // Новый пользователь → создаём запись, запоминаем его логин/пароль
+        // 5) Новый пользователь: создаём и возвращаем token для бота
         RegisteredUser created = registerUser(info, session);
-        // Генерируем токен для последующей передачи в Telegram
-        String tokenToBot = storePending(created.user().getId(),
+        String tokenToBot = storePending(
+                created.user().getId(),
                 created.user().getUsername(),
-                created.rawPassword());
-
+                created.rawPassword()
+        );
         return new OAuthResult(created.user(), tokenToBot);
     }
 
+    /**
+     * Запрос к token-endpoint Google: code → access_token
+     */
     private String fetchAccessToken(String code) throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
 
@@ -122,17 +138,17 @@ public class GoogleOAuthService {
                 )))
                 .build();
 
-        HttpResponse<String> response = client.send(request,
-                HttpResponse.BodyHandlers.ofString());
-
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         if (response.statusCode() != 200) {
             throw new IllegalStateException("Failed to obtain token, status=" + response.statusCode());
         }
-
         JsonNode node = mapper.readTree(response.body());
         return node.get("access_token").asText();
     }
 
+    /**
+     * Запрос к userinfo-endpoint Google: access_token → (id, email, name)
+     */
     private GoogleUserInfo fetchUserInfo(String accessToken) throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
 
@@ -141,13 +157,10 @@ public class GoogleOAuthService {
                 .header("Authorization", "Bearer " + accessToken)
                 .build();
 
-        HttpResponse<String> response = client.send(request,
-                HttpResponse.BodyHandlers.ofString());
-
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         if (response.statusCode() != 200) {
             throw new IllegalStateException("Failed to obtain user info, status=" + response.statusCode());
         }
-
         JsonNode node = mapper.readTree(response.body());
         return new GoogleUserInfo(
                 node.get("id").asText(),
@@ -157,14 +170,15 @@ public class GoogleOAuthService {
     }
 
     /**
-     * Создаём нового пользователя:
-     * - формируем уникальный username
-     * - генерируем rawPassword (случайный UUID), шифруем в базу
-     * - сохраняем в БД
-     * - кладём username+rawPassword в сессию для последующей передачи в Telegram
+     * Создаёт новую запись User в базе:
+     *  - Формирует уникальный username
+     *  - Генерирует случайный rawPassword (UUID)
+     *  - Шифрует пароль и сохраняет поля email, phone, role
+     *  - Сохраняет user в репозитории
+     *  - Запоминает username/rawPassword в сессии на случай дальнейшей передачи в Telegram
      */
     private RegisteredUser registerUser(GoogleUserInfo info, HttpSession session) {
-        // Генерируем базовый username из имени или из email
+        // 1) Уникальный username
         String baseUsername = info.name().replaceAll("\\s+", "").toLowerCase();
         if (baseUsername.isEmpty()) {
             baseUsername = info.email().split("@")[0];
@@ -175,17 +189,21 @@ public class GoogleOAuthService {
             username = baseUsername + i++;
         }
 
-        // Создаём сущность User и сохраняем
+        // 2) Заполняем User-сущность
         User u = new User();
         u.setUsername(username);
         u.setEmail(info.email());
-        u.setPhone("google-" + info.id()); // временное поле “phone”
+        // «Служебное» поле phone, чтобы не оставалось пустым
+        u.setPhone("google-" + info.id());
+        // Генерируем случайный пароль
         String rawPassword = UUID.randomUUID().toString();
         u.setPassword(passwordEncoder.encode(rawPassword));
         u.setRole(Role.ROLE_USER);
+
+        // 3) Сохраняем в базу
         u = userRepository.save(u);
 
-        // Запомним в сессии, чтобы позднее отослать Telegram
+        // 4) Сохраняем в HTTP-сессии для дальнейшего использования
         session.setAttribute("pendingUsername", username);
         session.setAttribute("pendingPassword", rawPassword);
 
@@ -193,10 +211,11 @@ public class GoogleOAuthService {
     }
 
     /**
-     * Метод вызывает из TelegramController, когда бот передаёт token, phone и chatId:
-     * - находит PendingData по токену → соответствующие username/rawPassword
-     * - сохраняет в базе chatId и настоящий номер телефона
-     * - отправляет пользователю в Telegram сообщение с логином/паролем
+     * Вызывается из TelegramController:
+     * Когда бот получит /start?token=XYZ, и сообщит chatId и телефон →
+     * 1) Проверяем существующий PendingData по токену
+     * 2) Сохраняем в User поля phone и telegramChatId
+     * 3) Отправляем через TelegramService логин/пароль
      */
     public void completePhoneRegistration(String token, String phone, String chatId) {
         PendingData data = pending.remove(token);
@@ -212,13 +231,11 @@ public class GoogleOAuthService {
         userRepository.save(user);
 
         String msg = "Ваш логин: " + data.username() + "\nПароль: " + data.rawPassword();
-        // Обращаемся к действующему chatId Telegram
         telegramService.sendMessage(chatId, msg);
     }
 
     /**
-     * Сохраняем в мапе pendingData → (userId, username, rawPassword),
-     * возвращаем сгенерированный токен.
+     * Сохраняет “token → (userId, username, rawPassword)” в локальную мапу и возвращает token.
      */
     private String storePending(long userId, String username, String rawPassword) {
         String token = UUID.randomUUID().toString();
@@ -226,18 +243,32 @@ public class GoogleOAuthService {
         return token;
     }
 
-    /** Простые структуры-обёртки */
+    /** Ищет в pending существующий токен по userId (на случай, если нужно вернуть ранее сгенерированный). */
+    private String findTokenByUserId(long userId) {
+        for (Map.Entry<String, PendingData> e : pending.entrySet()) {
+            if (e.getValue().userId() == userId) {
+                return e.getKey();
+            }
+        }
+        return null;
+    }
+
+    // === Вспомогательные record-классы ===
+
     private record PendingData(long userId, String username, String rawPassword) {}
+
     public record OAuthResult(User user, String token) {}
+
     private record RegisteredUser(User user, String rawPassword) {}
+
     private record GoogleUserInfo(String id, String email, String name) {}
 
-    /** Вспомогательный URL-энкодер */
+    // === Вспомогательные методы ===
+
     private static String encode(String value) {
         return URLEncoder.encode(value, StandardCharsets.UTF_8);
     }
 
-    /** Вспомогательный билд POST-формы */
     private static HttpRequest.BodyPublisher ofFormData(Map<String, String> data) {
         StringBuilder builder = new StringBuilder();
         for (Map.Entry<String, String> entry : data.entrySet()) {
