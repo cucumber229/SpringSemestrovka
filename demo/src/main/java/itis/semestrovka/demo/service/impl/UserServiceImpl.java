@@ -31,9 +31,17 @@ public class UserServiceImpl implements UserService {
         users.findByUsername(form.getUsername())
                 .ifPresent(u -> { throw new IllegalArgumentException("Пользователь уже существует"); });
 
+        users.findByEmail(form.getEmail())
+                .ifPresent(u -> { throw new IllegalArgumentException("Email уже используется"); });
+
+        users.findByPhone(form.getPhone())
+                .ifPresent(u -> { throw new IllegalArgumentException("Телефон уже используется"); });
+
         User u = new User();
         u.setUsername(form.getUsername());
         u.setPassword(encoder.encode(form.getPassword()));
+        u.setEmail(form.getEmail());
+        u.setPhone(form.getPhone());
         u.setRole(Role.ROLE_USER);
         return users.save(u);
     }
