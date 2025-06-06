@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -32,14 +33,17 @@ public class GoogleOAuthController {
     @GetMapping("/callback/google")
     public String callback(@RequestParam String code,
                            @RequestParam String state,
-                           HttpSession session) throws Exception {
+                           HttpSession session,
+                           Model model) throws Exception {
         User user = googleOAuthService.processCallback(code, state, session);
         UsernamePasswordAuthenticationToken auth =
                 new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
 
         if (user.getTelegramChatId() == null) {
-            return "redirect:" + botLink;
+            model.addAttribute("botLink", botLink);
+            return "telegram/redirect";
+
         }
         return "redirect:/projects";
     }
