@@ -17,4 +17,11 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
      */
     @Query("SELECT t FROM Team t LEFT JOIN FETCH t.members WHERE t.id = :id")
     Optional<Team> findByIdWithMembers(@Param("id") Long id);
+
+    /**
+     * Найти команды, чьё название содержит указанную подстроку,
+     * упорядочив их по дате создания от новых к старым.
+     */
+    @Query("SELECT t FROM Team t WHERE LOWER(t.name) LIKE LOWER(CONCAT('%', :name, '%')) ORDER BY t.createdAt DESC")
+    java.util.List<Team> findByPartialName(@Param("name") String name);
 }

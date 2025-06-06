@@ -29,9 +29,13 @@ public class TeamController {
 
     /** 1.1. Список всех команд (главная страница раздела «Команды») */
     @GetMapping
-    public String list(Model model) {
-        List<Team> teams = teamService.findAllTeams();
+    public String list(@RequestParam(value = "search", required = false) String search,
+                       Model model) {
+        List<Team> teams = (search != null && !search.isBlank())
+                ? teamService.findByPartialName(search)
+                : teamService.findAllTeams();
         model.addAttribute("teams", teams);
+        model.addAttribute("search", search);
         model.addAttribute("title", "Список команд");
         return "team/list";
     }
@@ -53,9 +57,13 @@ public class TeamController {
     /** 2.1. Страница администрирования (альтернативный список команд для админа) */
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/admin")
-    public String adminList(Model model) {
-        List<Team> teams = teamService.findAllTeams();
+    public String adminList(@RequestParam(value = "search", required = false) String search,
+                            Model model) {
+        List<Team> teams = (search != null && !search.isBlank())
+                ? teamService.findByPartialName(search)
+                : teamService.findAllTeams();
         model.addAttribute("teams", teams);
+        model.addAttribute("search", search);
         model.addAttribute("title", "Управление командами");
         return "team/admin_list";
     }
