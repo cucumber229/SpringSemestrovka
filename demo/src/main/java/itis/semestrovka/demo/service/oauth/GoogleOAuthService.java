@@ -5,7 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import itis.semestrovka.demo.model.entity.Role;
 import itis.semestrovka.demo.model.entity.User;
 import itis.semestrovka.demo.repository.UserRepository;
-import itis.semestrovka.demo.service.email.EmailService;
+import itis.semestrovka.demo.service.telegram.TelegramService;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -39,13 +40,14 @@ public class GoogleOAuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final EmailService emailService;
+    private final TelegramService telegramService;
     private final ObjectMapper mapper = new ObjectMapper();
 
-    public GoogleOAuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, EmailService emailService) {
+    public GoogleOAuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, TelegramService telegramService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.emailService = emailService;
+        this.telegramService = telegramService;
+
     }
 
     public String buildAuthorizationUrl(HttpSession session) {
@@ -132,8 +134,9 @@ public class GoogleOAuthService {
         u.setRole(Role.ROLE_USER);
         u = userRepository.save(u);
 
-        String message = "Ваш логин: " + username + "\nПароль: " + rawPassword;
-        emailService.sendEmail(info.email(), "Данные для входа", message);
+        String message = "Новый пользователь: " + username + "\nПароль: " + rawPassword;
+        telegramService.sendMessage(message);
+
         return u;
     }
 

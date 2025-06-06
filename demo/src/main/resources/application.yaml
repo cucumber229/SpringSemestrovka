@@ -24,7 +24,7 @@ google:
   redirect-uri: http://localhost:8080/oauth2/callback/google
 
 
-email:
-  api-url: ${EMAIL_API_URL:https://api.unisender.com/ru/api/sendEmail}
-  api-key: ${EMAIL_API_KEY:}
-  from: ${EMAIL_FROM:no-reply@example.com}
+telegram:
+  bot-token: ${TELEGRAM_BOT_TOKEN:}
+  chat-id: ${TELEGRAM_CHAT_ID:}
+
