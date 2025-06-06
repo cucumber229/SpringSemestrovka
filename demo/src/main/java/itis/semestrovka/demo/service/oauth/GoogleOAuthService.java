@@ -68,7 +68,7 @@ public class GoogleOAuthService {
     private String fetchAccessToken(String code) throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("ttps://oauth2.googleapis.com/token"))
+                .uri(URI.create("https://oauth2.googleapis.com/token"))
                 .header("Content-Type", "application/x-www-form-urlencoded")
                 .POST(ofFormData(Map.of(
                         "client_id", clientId,

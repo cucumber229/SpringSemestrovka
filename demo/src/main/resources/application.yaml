@@ -21,14 +21,13 @@ spring:
         format_sql: true
 
 google:
-  client-id: ${GOOGLE_CLIENT_ID}
-  client-secret: ${GOOGLE_CLIENT_SECRET}
+  client-id: ${73668923655-n0mnr5d63lph07s2leum9gdn4bug7i5a.apps.googleusercontent.com}
+  client-secret: ${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}
   redirect-uri: http://localhost:8080/oauth2/callback/google
 
 slack:
   webhook-url: ${SLACK_WEBHOOK_URL:https://discord.com/api/webhooks/1380488463744241816/JYEA024BxZdHxZE_VMmZGl5sJKVBOOatFkC3pqmNvMc5XimwEr2tChdL92o-ciLmSpRo}
 
-# Отключаем показ «default»-группы в Swagger UI (чтобы не было лишних MVC-эндпоинтов)
 springdoc:
   show-default-group: false
   swagger-ui:
