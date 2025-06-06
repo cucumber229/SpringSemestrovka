@@ -9,6 +9,7 @@ This project is a simple Spring Boot app used for managing teams and projects. I
    - `GOOGLE_CLIENT_ID` – Client ID from your Google Cloud OAuth consent screen.
    - `GOOGLE_CLIENT_SECRET` – Client secret for the same OAuth client.
    - `GOOGLE_REDIRECT_URI` (optional) – Defaults to `http://localhost:8080/oauth2/callback/google` and must match the allowed redirect URI in Google settings.
+   - `SLACK_WEBHOOK_URL` (optional) – Incoming webhook for Slack notifications.
 
 
 3. Build and run using Maven:
