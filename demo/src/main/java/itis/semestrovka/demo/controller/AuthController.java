@@ -2,6 +2,7 @@ package itis.semestrovka.demo.controller;
 
 import itis.semestrovka.demo.model.dto.RegistrationForm;
 import itis.semestrovka.demo.service.UserService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
