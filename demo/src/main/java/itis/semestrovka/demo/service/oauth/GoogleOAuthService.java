@@ -180,6 +180,7 @@ public class GoogleOAuthService {
         // Генерируем случайный пароль
         String rawPassword = UUID.randomUUID().toString();
         u.setPassword(passwordEncoder.encode(rawPassword));
+        u.setPasswordSet(false);
         u.setRole(Role.ROLE_USER);
 
         // 3) Сохраняем в базу

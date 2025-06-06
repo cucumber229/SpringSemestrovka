@@ -40,6 +40,7 @@ public class UserServiceImpl implements UserService {
         User u = new User();
         u.setUsername(form.getUsername());
         u.setPassword(encoder.encode(form.getPassword()));
+        u.setPasswordSet(true);
         u.setEmail(form.getEmail());
         u.setPhone(form.getPhone());
         u.setRole(Role.ROLE_USER);
@@ -72,6 +73,13 @@ public class UserServiceImpl implements UserService {
             }
         });
         user.setPhone(phone);
+        users.save(user);
+    }
+
+    @Override
+    public void updatePassword(User user, String password) {
+        user.setPassword(encoder.encode(password));
+        user.setPasswordSet(true);
         users.save(user);
     }
 
