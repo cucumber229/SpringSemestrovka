@@ -48,6 +48,7 @@ public class GoogleOAuthController {
         SecurityContextHolder.setContext(context);
         session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
 
+
         return "redirect:/projects";
 
     }
