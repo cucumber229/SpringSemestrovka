@@ -1,0 +1,21 @@
+### Create task
+POST http://localhost:8080/api/projects/1/tasks
+Content-Type: application/json
+X-CSRF-TOKEN: {{_csrf}}
+
+{
+  "title": "Task title",
+  "description": "Optional desc"
+}
+
+### Delete task
+DELETE http://localhost:8080/api/projects/1/tasks/2
+X-CSRF-TOKEN: {{_csrf}}
+
+### Add participant
+POST http://localhost:8080/api/projects/1/tasks/2/participants/3
+X-CSRF-TOKEN: {{_csrf}}
+
+### Remove participant
+DELETE http://localhost:8080/api/projects/1/tasks/2/participants/3
+X-CSRF-TOKEN: {{_csrf}}

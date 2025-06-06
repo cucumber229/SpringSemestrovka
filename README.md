@@ -36,3 +36,13 @@ TaskDto dto = TaskConverter.toDto(task);
 `TaskConverter` is invoked from `TaskServiceImpl#create` when a new task is created through the REST API.
 
 `TeamConverter` is used in `TeamRestController` to expose REST endpoints that work with `TeamDto` objects.
+
+## REST API and Swagger
+
+All REST endpoints are grouped under the `/api/**` path. The API documentation
+is generated using **springdoc-openapi** and is available at
+`http://localhost:8080/swagger-ui.html` once the application is running.
+
+Example HTTP request files for `TeamRestController` and `TaskRestController` can
+be found in the `demo/http` directory. They can be executed from IntelliJ IDEA
+or imported into tools like Postman.
