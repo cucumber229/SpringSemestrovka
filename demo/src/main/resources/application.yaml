@@ -25,5 +25,5 @@ google:
 
 
 telegram:
-  bot-token: ${TELEGRAM_BOT_TOKEN:}
+  bot-token: ${TELEGRAM_BOT_TOKEN:7995355623:AAFZ1JZBOKR66n2IyHAIlVESM7ye_5Dqgcs}
 
