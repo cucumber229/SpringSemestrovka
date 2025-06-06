@@ -34,3 +34,5 @@ TaskDto dto = TaskConverter.toDto(task);
 ```
 
 `TaskConverter` is invoked from `TaskServiceImpl#create` when a new task is created through the REST API.
+
+`TeamConverter` is used in `TeamRestController` to expose REST endpoints that work with `TeamDto` objects.
