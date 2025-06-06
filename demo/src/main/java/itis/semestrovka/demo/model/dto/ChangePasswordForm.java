@@ -14,6 +14,6 @@ public class ChangePasswordForm {
     private String newPassword;
 
     @NotBlank(message = "Повторите новый пароль")
-    @Size(min = 8, message = "Пароль должен быть не менее 8 символов")
+
     private String confirmPassword;
 }
