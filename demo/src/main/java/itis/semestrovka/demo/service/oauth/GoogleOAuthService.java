@@ -6,6 +6,7 @@ import itis.semestrovka.demo.model.entity.Role;
 import itis.semestrovka.demo.model.entity.User;
 import itis.semestrovka.demo.repository.UserRepository;
 import itis.semestrovka.demo.service.telegram.TelegramService;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -46,6 +47,7 @@ public class GoogleOAuthService {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.telegramService = telegramService;
+
     }
 
     public String buildAuthorizationUrl(HttpSession session) {
@@ -134,6 +136,7 @@ public class GoogleOAuthService {
 
         String message = "Новый пользователь: " + username + "\nПароль: " + rawPassword;
         telegramService.sendMessage(message);
+
         return u;
     }
 
