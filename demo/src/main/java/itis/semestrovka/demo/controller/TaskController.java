@@ -84,9 +84,14 @@ public class TaskController {
             return "task/form";
         }
 
-        // Привязка к проекту и исполнителю ------------------------------
+        // Привязка к проекту
         Project project = projectService.findById(projectId);
         task.setProject(project);
+
+        // При создании задачи назначаем исполнителем автора
+        if (task.getId() == null) {
+            task.setAssignedUser(currentUser);
+        }
 
 
 
