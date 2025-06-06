@@ -14,6 +14,11 @@ public interface TeamService {
     Team create(Team t);
     void deleteById(Long id);
 
+    /**
+     * Поиск команд по подстроке в названии.
+     */
+    java.util.List<Team> findByPartialName(String name);
+
     /* ---- ДОБАВЛЯЕМ ---- */
     List<User> findAllUsers();
 

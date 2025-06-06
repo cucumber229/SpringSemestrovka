@@ -33,6 +33,11 @@ public class TeamServiceImpl implements TeamService {
     @Override public Team create(Team t)         { return teamRepo.save(t); }
     @Override public void deleteById(Long id)    { teamRepo.deleteById(id); }
 
+    @Override
+    public java.util.List<Team> findByPartialName(String name) {
+        return teamRepo.findByPartialName(name);
+    }
+
     /* ---------- НОВЫЕ МЕТОДЫ ---------- */
 
     @Override

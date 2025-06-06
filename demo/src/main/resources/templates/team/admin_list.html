@@ -17,8 +17,12 @@
       <div class="col-md-10">
         <div class="card">
           <!-- Шапка карточки -->
-          <div class="card-header">
+          <div class="card-header d-flex justify-content-between align-items-center gap-2 flex-wrap">
             <h3 class="mb-0" th:text="${title}">Управление командами</h3>
+            <form th:action="@{/teams/admin}" method="get" class="d-flex align-items-center" style="gap:0.5rem;">
+              <input type="text" name="search" class="form-control form-control-sm" placeholder="Поиск" th:value="${search}">
+              <button type="submit" class="btn btn-primary btn-sm">Найти</button>
+            </form>
             <div class="d-flex gap-2">
               <a th:href="@{/teams/new}" class="btn-success btn-sm">Создать команду</a>
               <a th:href="@{/teams}" class="btn-outline-light btn-sm">Назад к списку</a>
