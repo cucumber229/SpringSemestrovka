@@ -1,4 +1,5 @@
 ### Create task
+@_csrf = variable value
 POST http://localhost:8080/api/projects/1/tasks
 Content-Type: application/json
 X-CSRF-TOKEN: {{_csrf}}

@@ -3,6 +3,7 @@ GET http://localhost:8080/api/teams
 X-CSRF-TOKEN: {{_csrf}}
 
 ### Create a team
+@_csrf = variable value
 POST http://localhost:8080/api/teams
 Content-Type: application/json
 X-CSRF-TOKEN: {{_csrf}}
