@@ -6,6 +6,7 @@ import itis.semestrovka.demo.model.entity.Task;
 import itis.semestrovka.demo.model.entity.User;
 import itis.semestrovka.demo.model.entity.Role;
 import itis.semestrovka.demo.service.ProjectService;
+import org.springframework.beans.factory.annotation.Value;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,6 +23,8 @@ import java.util.List;
 public class ProjectController {
 
     private final ProjectService projectService;
+    @Value("${telegram.bot-link:https://t.me/your_bot}")
+    private String botLink;
 
     public ProjectController(ProjectService projectService) {
         this.projectService = projectService;
@@ -117,6 +120,7 @@ public class ProjectController {
         String reverseDir = sortDir.equalsIgnoreCase("asc") ? "desc" : "asc";
         model.addAttribute("reverseDir", reverseDir);
         model.addAttribute("showTelegramPrompt", telegramPrompt != null);
+        model.addAttribute("botLink", botLink);
 
         return "project/list";
     }
