@@ -138,7 +138,7 @@ public class ProjectController {
     public String save(
             @Valid @ModelAttribute("project") Project project,
             BindingResult br,
-            @RequestParam("projectType") String projectType,
+            @RequestParam(value = "projectType", required = false, defaultValue = "PRIVATE") String projectType,
             @AuthenticationPrincipal User currentUser,
             Model model
     ) {
