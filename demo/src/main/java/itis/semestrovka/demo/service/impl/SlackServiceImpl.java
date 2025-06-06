@@ -32,7 +32,7 @@ public class SlackServiceImpl implements SlackService {
         }
         String text = String.format("Новая задача \"%s\" в проекте \"%s\" (автор: %s)",
                 taskTitle, projectName, authorUsername);
-        Map<String, String> payload = Map.of("text", text);
+        Map<String, String> payload = Map.of("content", text);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<Map<String, String>> entity = new HttpEntity<>(payload, headers);
