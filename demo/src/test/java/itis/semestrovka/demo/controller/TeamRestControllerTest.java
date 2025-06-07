@@ -3,6 +3,7 @@ package itis.semestrovka.demo.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import itis.semestrovka.demo.model.dto.TeamDto;
 import itis.semestrovka.demo.model.entity.Team;
+import itis.semestrovka.demo.model.entity.User;
 import itis.semestrovka.demo.service.TeamService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,5 +78,18 @@ class TeamRestControllerTest {
                 .andExpect(status().isNoContent());
 
         verify(teamService).removeUserFromTeam(1L, 7L);
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void getMembersReturnsUserList() throws Exception {
+        User u = new User();
+        u.setId(3L);
+        u.setUsername("user");
+        when(teamService.findTeamMembers(1L)).thenReturn(List.of(u));
+
+        mockMvc.perform(get("/api/teams/1/users"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(3));
     }
 }

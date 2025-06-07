@@ -9,6 +9,7 @@ public interface TeamService {
     void deleteById(Long id);
     java.util.List<Team> findByPartialName(String name);
     List<User> findAllUsers();
+    List<User> findTeamMembers(Long teamId);
     void addUserToTeam(Long teamId, Long userId);
     void removeUserFromTeam(Long teamId, Long userId);
 }
