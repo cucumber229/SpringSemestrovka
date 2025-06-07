@@ -2,7 +2,8 @@
 <html lang="ru"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout}" xmlns:sec="http://www.w3.org/1999/xhtml">
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layout}">
 <head>
   <meta charset="UTF-8"/>
   <title layout:fragment="title"
@@ -11,42 +12,42 @@
   <link rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
+
 <body>
 <div layout:fragment="content" class="py-4">
 
-  <!-- Карточка с деталями команды -->
+  <!-- ====== Карточка ====== -->
   <div class="row justify-content-center">
     <div class="col-md-10">
       <div class="card mt-4 shadow-sm">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
           <h3 class="mb-0" th:text="'Команда «' + ${team.name} + '»'">Команда</h3>
+
+          <!-- Кнопки редактирования / удаления -->
           <div class="d-flex gap-2" sec:authorize="hasRole('ROLE_ADMIN')">
-            <a th:href="@{|/teams/${team.id}/edit|}" class="btn btn-sm btn-outline-light" title="Редактировать">
+            <a th:href="@{|/teams/${team.id}/edit|}"
+               class="btn btn-sm btn-outline-light" title="Редактировать">
               <i class="bi bi-pencil"></i>
             </a>
-            <form th:action="@{|/teams/${team.id}/delete|}" method="post" style="display: contents">
+            <form th:action="@{|/teams/${team.id}/delete|}" method="post" style="display:contents">
               <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-              <button type="submit" class="btn btn-sm btn-outline-light"
+              <button class="btn btn-sm btn-outline-light"
                       onclick="return confirm('Удалить команду?');" title="Удалить">
                 <i class="bi bi-trash"></i>
               </button>
             </form>
           </div>
         </div>
+
         <div class="card-body">
-          <div class="row mb-2">
-            <div class="col-sm-3 text-muted">Название:</div>
-            <div class="col-sm-9" th:text="${team.name}">Название команды</div>
-          </div>
-          <div class="row mb-2">
-            <div class="col-sm-3 text-muted">Описание:</div>
-            <div class="col-sm-9" th:text="${team.description}">Описание команды</div>
-          </div>
-          <div class="row mb-2">
-            <div class="col-sm-3 text-muted">Участников:</div>
-            <div class="col-sm-9" id="memberTotal">0 чел.</div>
-          </div>
+          <div class="row mb-2"><div class="col-sm-3 text-muted">Название:</div>
+            <div class="col-sm-9" th:text="${team.name}">—</div></div>
+          <div class="row mb-2"><div class="col-sm-3 text-muted">Описание:</div>
+            <div class="col-sm-9" th:text="${team.description}">—</div></div>
+          <div class="row mb-2"><div class="col-sm-3 text-muted">Участников:</div>
+            <div class="col-sm-9" id="memberTotal">0 чел.</div></div>
         </div>
+
         <div class="card-footer">
           <a th:href="@{/teams}" class="btn btn-outline-secondary btn-sm">← К списку команд</a>
         </div>
@@ -54,7 +55,7 @@
     </div>
   </div>
 
-  <!-- Участники команды -->
+  <!-- ====== Таблица участников ====== -->
   <div class="row justify-content-center mt-4">
     <div class="col-md-10">
       <div class="card shadow-sm">
@@ -66,9 +67,10 @@
             Добавить участника
           </a>
         </div>
+
         <div class="card-body p-0">
           <div class="table-responsive">
-            <table id="membersTable" class="table table-hover mb-0">
+            <table class="table table-hover mb-0">
               <thead class="table-light">
               <tr>
                 <th>Имя пользователя</th>
@@ -76,13 +78,12 @@
               </tr>
               </thead>
               <tbody id="membersBody">
-              <tr>
-                <td class="text-center py-3" colspan="2">Загрузка...</td>
-              </tr>
+              <tr><td class="text-center py-3" colspan="2">Загрузка...</td></tr>
               </tbody>
             </table>
           </div>
         </div>
+
         <div class="card-footer text-muted">
           Всего участников: <span id="memberCount">0</span>
         </div>
@@ -90,70 +91,68 @@
     </div>
   </div>
 
+  <!-- ======= JS ======= -->
   <script th:inline="javascript">
     /*<![CDATA[*/
     const teamId     = /*[[${team.id}]]*/ 0;
-    const csrfHeader = /*[['${_csrf.headerName}']]*/ 'X-CSRF-TOKEN';
-    const csrfToken  = /*[['${_csrf.token}']]*/ '';
+    const csrfHeader = /*[[${_csrf.headerName}]]*/ 'X-CSRF-TOKEN';
+    const csrfToken  = /*[[${_csrf.token}]]*/ '';
+    const isAdmin    = /*[[${#authorization.expression('hasRole(''ADMIN'')')}]]*/ false;
 
-    // Функция загрузки списка участников
-    async function loadMembers() {
-      console.log('Loading members for team', teamId);
-      const resp = await fetch(`/api/teams/${teamId}/users`, {
-        credentials: 'same-origin'
-      });
-      console.log('GET /api/teams/' + teamId + '/users ->', resp.status);
-      const members = await resp.json();
+    /* загрузка списка */
+    async function loadMembers(){
+      const resp = await fetch(`/api/teams/${teamId}/users`,{credentials:'same-origin'});
+      const list = await resp.json();
 
-      const tbody = document.getElementById('membersBody');
-      tbody.innerHTML = '';
-      if (members.length === 0) {
-        const tr = document.createElement('tr');
-        tr.innerHTML = '<td class="text-center py-3" colspan="2">Участников нет</td>';
-        tbody.appendChild(tr);
-      } else {
-        members.forEach(m => {
-          const tr = document.createElement('tr');
-          const tdName = document.createElement('td');
-          tdName.textContent = m.username;
-          tr.appendChild(tdName);
-          const tdAct = document.createElement('td');
-          tdAct.className = 'text-end';
-          const btn = document.createElement('button');
-          btn.type = 'button';
-          btn.className = 'btn btn-sm btn-outline-danger';
-          btn.textContent = 'Удалить';
-          btn.addEventListener('click', () => removeUser(m.id));
-          tdAct.appendChild(btn);
-          tr.appendChild(tdAct);
-          tbody.appendChild(tr);
+      const body = document.getElementById('membersBody');
+      body.innerHTML = '';
+
+      if(!list.length){
+        body.innerHTML = '<tr><td colspan="2" class="text-center py-3">Участников нет</td></tr>';
+      }else{
+        list.forEach(u=>{
+          const row = document.createElement('tr');
+          row.innerHTML = `<td>${u.username}</td>` +
+                  (isAdmin ? `<td class="text-end">
+                        <button class="btn btn-sm btn-outline-danger" data-uid="${u.id}">Удалить</button>
+                      </td>` : '<td></td>');
+          body.appendChild(row);
         });
       }
-      document.getElementById('memberCount').textContent = members.length;
-      document.getElementById('memberTotal').textContent = members.length + ' чел.';
+      document.getElementById('memberCount').textContent  = list.length;
+      document.getElementById('memberTotal').textContent  = list.length + ' чел.';
     }
 
-    // Функция удаления одного пользователя
-    async function removeUser(userId) {
-      if (!confirm('Удалить пользователя из команды?')) return;
-      const url = `/api/teams/${teamId}/users/${userId}`;
-      console.log('DELETE request to:', url);
-      const resp = await fetch(url, {
-        method: 'DELETE',
-        headers: { [csrfHeader]: csrfToken },
-        credentials: 'same-origin'
+    /* обработчик клика по «Удалить» (делегирование) */
+    document.addEventListener('click', async e=>{
+      const btn = e.target.closest('[data-uid]');
+      if(!btn) return;
+
+      if(!confirm('Удалить пользователя из команды?')) return;
+      const uid = btn.dataset.uid;
+
+      const r = await fetch(`/api/teams/${teamId}/users/${uid}`,{
+        method:'DELETE',
+        headers:{[csrfHeader]:csrfToken},
+        credentials:'same-origin'
       });
-      console.log('Response:', resp.status, await resp.text());
-      if (resp.ok) {
-        await loadMembers();
-      } else {
-        alert('Ошибка удаления участника: ' + resp.status);
-      }
-    }
+      if(r.ok){
+        btn.closest('tr').remove();
+        // пересчитать счётчик
+        const cnt = document.querySelectorAll('#membersBody tr').length;
+        document.getElementById('memberCount').textContent = cnt;
+        document.getElementById('memberTotal').textContent = cnt + ' чел.';
+        if(cnt===0){
+          document.getElementById('membersBody').innerHTML =
+                  '<tr><td colspan="2" class="text-center py-3">Участников нет</td></tr>';
+        }
+      }else alert('Ошибка: '+r.status);
+    });
 
     document.addEventListener('DOMContentLoaded', loadMembers);
     /*]]>*/
   </script>
+
 </div>
 </body>
 </html>
