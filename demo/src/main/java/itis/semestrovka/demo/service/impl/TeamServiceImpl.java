@@ -29,6 +29,11 @@ public class TeamServiceImpl implements TeamService {
     public List<User> findAllUsers() {
         return userRepo.findAll();
     }
+
+    @Override
+    public List<User> findTeamMembers(Long teamId) {
+        return userRepo.findAllByTeamId(teamId);
+    }
     @Override
     public void addUserToTeam(Long teamId, Long userId) {
         Team team = teamRepo.findById(teamId).orElseThrow();
@@ -38,13 +43,11 @@ public class TeamServiceImpl implements TeamService {
     }
     @Override
     public void removeUserFromTeam(Long teamId, Long userId) {
-        Team team = teamRepo.findById(teamId).orElseThrow();
         User user = userRepo.findById(userId).orElseThrow();
-            Team userTeam = user.getTeam();
-        if (userTeam == null || !userTeam.getId().equals(team.getId())) {
+        Team userTeam = user.getTeam();
+        if (userTeam == null || !userTeam.getId().equals(teamId)) {
             throw new IllegalStateException("Пользователь не состоит в этой команде");
         }
-
         user.setTeam(null);
         userRepo.save(user);
     }

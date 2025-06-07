@@ -1,7 +1,9 @@
 package itis.semestrovka.demo.controller;
 import itis.semestrovka.demo.service.TeamService;
 import itis.semestrovka.demo.model.dto.TeamDto;
+import itis.semestrovka.demo.model.dto.UserDto;
 import itis.semestrovka.demo.mapper.TeamConverter;
+import itis.semestrovka.demo.mapper.UserConverter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +35,14 @@ public class TeamRestController {
     @Operation(summary = "Get team by id")
     public TeamDto getById(@PathVariable Long id) {
         return TeamConverter.toDto(teamService.findById(id));
+    }
+
+    @GetMapping("/{teamId}/users")
+    @Operation(summary = "Get team members")
+    public java.util.List<UserDto> getTeamMembers(@PathVariable Long teamId) {
+        return teamService.findTeamMembers(teamId).stream()
+                .map(UserConverter::toDto)
+                .toList();
     }
     @DeleteMapping("/{teamId}/users/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
