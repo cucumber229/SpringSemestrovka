@@ -92,13 +92,15 @@
 
   <script th:inline="javascript">
     /*<![CDATA[*/
-    const teamId = /*[[${team.id}]]*/ 0;
+    const teamId     = /*[[${team.id}]]*/ 0;
     const csrfHeader = /*[['${_csrf.headerName}']]*/ 'X-CSRF-TOKEN';
     const csrfToken  = /*[['${_csrf.token}']]*/ '';
-    const isAdmin    = /*[[${#authorization.expression('hasRole(''ADMIN'')')}]]*/ false;
 
+    // Функция загрузки списка участников
     async function loadMembers() {
+      console.log('Loading members for team', teamId);
       const resp = await fetch(`/api/teams/${teamId}/users`);
+      console.log('GET /api/teams/' + teamId + '/users ->', resp.status);
       const members = await resp.json();
 
       const tbody = document.getElementById('membersBody');
@@ -113,17 +115,15 @@
           const tdName = document.createElement('td');
           tdName.textContent = m.username;
           tr.appendChild(tdName);
-          if (isAdmin) {
-            const tdAct = document.createElement('td');
-            tdAct.className = 'text-end';
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'btn btn-sm btn-outline-danger';
-            btn.textContent = 'Удалить';
-            btn.addEventListener('click', () => removeUser(m.id));
-            tdAct.appendChild(btn);
-            tr.appendChild(tdAct);
-          }
+          const tdAct = document.createElement('td');
+          tdAct.className = 'text-end';
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'btn btn-sm btn-outline-danger';
+          btn.textContent = 'Удалить';
+          btn.addEventListener('click', () => removeUser(m.id));
+          tdAct.appendChild(btn);
+          tr.appendChild(tdAct);
           tbody.appendChild(tr);
         });
       }
@@ -131,16 +131,20 @@
       document.getElementById('memberTotal').textContent = members.length + ' чел.';
     }
 
+    // Функция удаления одного пользователя
     async function removeUser(userId) {
       if (!confirm('Удалить пользователя из команды?')) return;
-      const resp = await fetch(`/api/teams/${teamId}/users/${userId}`, {
+      const url = `/api/teams/${teamId}/users/${userId}`;
+      console.log('DELETE request to:', url);
+      const resp = await fetch(url, {
         method: 'DELETE',
         headers: { [csrfHeader]: csrfToken }
       });
+      console.log('Response:', resp.status, await resp.text());
       if (resp.ok) {
         await loadMembers();
       } else {
-        alert('Ошибка удаления участника');
+        alert('Ошибка удаления участника: ' + resp.status);
       }
     }
 
