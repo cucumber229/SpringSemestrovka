@@ -104,7 +104,8 @@
       const userId = btn.dataset.userId;
       const resp = await fetch(`/projects/${projectId}/tasks/${taskId}/participants/${userId}/delete`, {
         method: 'POST',
-        headers: { [csrfHeader]: csrfToken }
+        headers: { [csrfHeader]: csrfToken },
+        credentials: 'same-origin'
       });
       if (resp.ok) {
         const li = btn.closest('.participant-item');

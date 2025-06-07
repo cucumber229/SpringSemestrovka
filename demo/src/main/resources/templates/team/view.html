@@ -99,7 +99,9 @@
     // Функция загрузки списка участников
     async function loadMembers() {
       console.log('Loading members for team', teamId);
-      const resp = await fetch(`/api/teams/${teamId}/users`);
+      const resp = await fetch(`/api/teams/${teamId}/users`, {
+        credentials: 'same-origin'
+      });
       console.log('GET /api/teams/' + teamId + '/users ->', resp.status);
       const members = await resp.json();
 
@@ -138,7 +140,8 @@
       console.log('DELETE request to:', url);
       const resp = await fetch(url, {
         method: 'DELETE',
-        headers: { [csrfHeader]: csrfToken }
+        headers: { [csrfHeader]: csrfToken },
+        credentials: 'same-origin'
       });
       console.log('Response:', resp.status, await resp.text());
       if (resp.ok) {
