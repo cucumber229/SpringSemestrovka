@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/teams")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ROLE_ADMIN')")
 @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = "X-CSRF-TOKEN")
 @Tag(name = "Teams", description = "Operations with teams")
 public class TeamRestController {
@@ -27,6 +26,7 @@ public class TeamRestController {
     }
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Operation(summary = "Create team")
     public TeamDto create(@RequestBody TeamDto dto) {
         return TeamConverter.toDto(teamService.create(TeamConverter.toEntity(dto)));
@@ -46,6 +46,7 @@ public class TeamRestController {
     }
     @DeleteMapping("/{teamId}/users/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Operation(summary = "Remove user from team")
     public void removeUser(
             @PathVariable Long teamId,
